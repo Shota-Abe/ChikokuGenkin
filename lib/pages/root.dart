@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:calendar_hackathon/pages/alarm.dart';
 import 'package:calendar_hackathon/pages/calendar.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,25 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
-  final _screens = [CalendarView(), AlarmView(DateTime.now().add(Duration(seconds: 5)))];
+  final _screens = [CalendarView(), AlarmView()];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> setAlarm(DateTime dateTime, [bool enableNotif = true]) async {
+    final alarmSettings = AlarmSettings(
+      dateTime: dateTime,
+      assetAudioPath: 'assets/alarm.mp3',
+      loopAudio: true,
+      notificationTitle: enableNotif ? 'Alarm example' : null,
+      notificationBody: enableNotif ? 'Your alarm is ringing' : null,
+      enableNotificationOnKill: true,
+    );
+
+    await Alarm.set(settings: alarmSettings);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +38,9 @@ class _RootState extends State<Root> {
         onDestinationSelected: (int index) {
           setState(() {
             _currentIndex = index;
+            if (index == 1) {
+              setAlarm(DateTime.now().add(const Duration(seconds: 5)));
+            }
           });
         },
         selectedIndex: _currentIndex,
