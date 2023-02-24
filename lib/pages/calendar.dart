@@ -1,7 +1,10 @@
+import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class CalendarView extends StatefulWidget {
   const CalendarView({Key? key}) : super(key: key);
@@ -12,6 +15,8 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   TextEditingController titelContoroller = TextEditingController();
+  TextEditingController revenueContoroller = TextEditingController();
+  TextEditingController expenditureContoroller = TextEditingController();
   DateTime now = DateTime.now(); //現在の日付と時間を取得
   List<String> weekName = ['日', '月', '火', '水', '木', '金', '土']; //曜日の表示用のリスト
   late PageController controller;
@@ -60,6 +65,12 @@ class _CalendarViewState extends State<CalendarView> {
           endAt: DateTime(2023, 2, 26, 20),
           getUpTime: DateTime(2023, 2, 24, 6),
           memo: ''),
+    ]
+  };
+
+  Map<DateTime, List<Money>> moneyMap = {
+    DateTime(2023, 2, 24): [
+      Money(title: 'お昼ごはん', revenue: 0, expenditure: 2000),
     ]
   };
 
@@ -118,27 +129,54 @@ class _CalendarViewState extends State<CalendarView> {
           //日付を表示する
           Expanded(child: createCalendarItem()),
           Container(
-            alignment: Alignment.centerRight,
             height: 50,
             width: double.infinity,
             color: Theme.of(context).primaryColor,
-            child: IconButton(
-              splashRadius: 30,
-              onPressed: () async {
-                selectedStartTime = selectedDate;
-                await showDialog(
-                    context: context,
-                    builder: (context) {
-                      return buildAddScheduleDialog();
-                    });
-                titelContoroller.clear();
-                setState(() {});
-              },
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 30,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: IconButton(
+                    splashRadius: 30,
+                    onPressed: () async {
+                      selectedStartTime = selectedDate;
+                      await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return buildAddScheduleDialog();
+                          });
+                      titelContoroller.clear();
+                      setState(() {});
+                    },
+                    icon: const Icon(
+                      Icons.calendar_month,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    splashRadius: 30,
+                    onPressed: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return buildAddmoneyDialog();
+                          });
+                      titelContoroller.clear();
+                      revenueContoroller.clear();
+                      expenditureContoroller.clear();
+                      setState(() {});
+                    },
+                    icon: const Icon(
+                      Icons.credit_card,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
           Container(
@@ -302,7 +340,85 @@ class _CalendarViewState extends State<CalendarView> {
     });
   }
 
+  Widget buildAddmoneyDialog() {
+    return StatefulBuilder(builder: (context, setState) {
+      return SimpleDialog(
+        titlePadding: EdgeInsets.zero,
+        title: Column(
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  splashRadius: 10,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.cancel),
+                ),
+                Expanded(
+                    child: TextField(
+                  controller: titelContoroller,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'タイトルを入力'),
+                )),
+                IconButton(
+                  splashRadius: 10,
+                  onPressed: () {
+                    //歳入歳出を追加する処理
+                    DateTime checkScheduleTime = DateTime(selectedDate.year,
+                        selectedDate.month, selectedDate.day);
+                    Money newmoneyManager = Money(
+                        title: titelContoroller.text,
+                        revenue: int.parse(revenueContoroller.text),
+                        expenditure: int.parse(expenditureContoroller.text));
+
+                    if (moneyMap.containsKey(checkScheduleTime)) {
+                      moneyMap[checkScheduleTime]!.add(newmoneyManager);
+                    } else {
+                      moneyMap[checkScheduleTime] = [newmoneyManager];
+                    }
+                    Navigator.pop(context, true);
+                  },
+                  icon: const Icon(Icons.check_circle),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    controller: revenueContoroller,
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, hintText: '収入'),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: TextField(
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                  controller: expenditureContoroller,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: '支出'),
+                )),
+              ],
+            )
+          ],
+        ),
+      );
+    });
+  }
+
   Widget buildGetUpTimeDialog() {
+    getUpTime = DateTime(selectedStartTime!.year, selectedStartTime!.month,
+        selectedStartTime!.day, 6, 0);
     return Padding(
       padding: const EdgeInsets.only(top: 30),
       child: StatefulBuilder(builder: (context, setState) {
@@ -656,6 +772,7 @@ class _CalendarViewState extends State<CalendarView> {
               selectDate: selectDate,
               editSchedule: editSchedule,
               deleteSchedule: deleteSchedule,
+              moneyList: moneyMap[DateTime(date.year, date.month, i + 1)],
             ));
             int repeatNumber = 7 - _listCache.length;
             if (date.add(Duration(days: i)).weekday == 6) {
@@ -700,6 +817,7 @@ class _CalenderItem extends StatelessWidget {
   final Function selectDate;
   final Function editSchedule;
   final Function deleteSchedule;
+  final List<Money>? moneyList;
   const _CalenderItem(
       {required this.day,
       required this.now,
@@ -709,6 +827,7 @@ class _CalenderItem extends StatelessWidget {
       required this.selectDate,
       required this.editSchedule,
       required this.deleteSchedule,
+      required this.moneyList,
       Key? key})
       : super(key: key);
 
@@ -807,7 +926,30 @@ class _CalenderItem extends StatelessWidget {
                                   ),
                                 ),
                               ))
-                          .toList())
+                          .toList()),
+              /*moneyList == null
+                  ? Container()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: moneyList!
+                          .map((e) => Container(
+                                width: double.infinity,
+                                height: 20,
+                                alignment: Alignment.centerLeft,
+                                margin: const EdgeInsets.only(
+                                    left: 2, right: 2, top: 2),
+                                padding:
+                                    const EdgeInsets.only(left: 2, right: 2),
+                                color: Colors.green.withOpacity(0.8),
+                                child: Text(
+                                  e.title,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 10),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ))
+                          .toList(),
+                    )*/
             ],
           ),
         ),
