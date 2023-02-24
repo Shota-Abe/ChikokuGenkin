@@ -2,32 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
 
-import 'package:alarm/alarm.dart';
-import 'package:calendar_hackathon/pages/calendar.dart';
-import 'package:wakelock/wakelock.dart';
-
-import 'pages/root.dart';
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Wakelock.disable();
-
-  await Alarm.init();
-
-  runApp(const MaterialApp(home: MyApp()));
+void main() {
+  return runApp(_ChartApp());
 }
 
 class _ChartApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
-      // home: const CalendarView(),
-      home: Root(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: _MyHomePage(),
     );
   }
 }
@@ -41,7 +25,6 @@ class _MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<_MyHomePage> {
-  
   late List<_ChartData> data;
   late TooltipBehavior _tooltip;
   String? isSelectedItem = '50000';
