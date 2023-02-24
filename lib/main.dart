@@ -1,6 +1,8 @@
 import 'package:calendar_hackathon/pages/calendar.dart';
 import 'package:flutter/material.dart';
 
+import 'pages/root.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,7 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const CalendarView(),
+      // home: const CalendarView(),
+      home: Root(),
     );
   }
 }
