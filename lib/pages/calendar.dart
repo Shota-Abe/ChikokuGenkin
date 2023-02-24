@@ -14,9 +14,8 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   TextEditingController titelContoroller = TextEditingController();
-  TextEditingController revenueContoroller = TextEditingController(text: '0');
-  TextEditingController expenditureContoroller =
-      TextEditingController(text: '0');
+  TextEditingController revenueContoroller = TextEditingController();
+  TextEditingController expenditureContoroller = TextEditingController();
   DateTime now = DateTime.now(); //現在の日付と時間を取得
   List<String> weekName = ['日', '月', '火', '水', '木', '金', '土']; //曜日の表示用のリスト
   late PageController controller;
