@@ -18,10 +18,10 @@ Future<void> main() async {
 
   await Alarm.init();
 
-  runApp(const MaterialApp(home: MyApp()));
+  runApp(MyApp());
 }
 
-class _ChartApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,7 +41,6 @@ class _MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<_MyHomePage> {
-  
   late List<_ChartData> data;
   late TooltipBehavior _tooltip;
   String? isSelectedItem = '50000';

@@ -30,10 +30,6 @@ class _RootState extends State<Root> {
     await Alarm.set(settings: alarmSettings);
   }
 
-  Future<void> stopAlarm() async {
-    await Alarm.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +39,6 @@ class _RootState extends State<Root> {
           setState(() {
             _currentIndex = index;
             if (index == 1) {
-              stopAlarm();
               setAlarm(DateTime.now().add(const Duration(seconds: 5)));
             }
           });
