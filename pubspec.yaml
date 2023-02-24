@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   intl: any
   table_calendar: ^3.0.9
+  alarm: ^0.1.2
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:
