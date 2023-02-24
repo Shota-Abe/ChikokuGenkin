@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class CalendarView extends StatefulWidget {
   const CalendarView({Key? key}) : super(key: key);
@@ -15,8 +14,9 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   TextEditingController titelContoroller = TextEditingController();
-  TextEditingController revenueContoroller = TextEditingController();
-  TextEditingController expenditureContoroller = TextEditingController();
+  TextEditingController revenueContoroller = TextEditingController(text: '0');
+  TextEditingController expenditureContoroller =
+      TextEditingController(text: '0');
   DateTime now = DateTime.now(); //現在の日付と時間を取得
   List<String> weekName = ['日', '月', '火', '水', '木', '金', '土']; //曜日の表示用のリスト
   late PageController controller;
@@ -52,7 +52,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   Map<DateTime, List<Schedule>> scheduleMap = {
     //スケジュール
-    DateTime(2023, 2, 24): [
+    /*DateTime(2023, 2, 24): [
       Schedule(
           title: 'ハッカソン',
           startAt: DateTime(2023, 2, 24, 10),
@@ -65,7 +65,7 @@ class _CalendarViewState extends State<CalendarView> {
           endAt: DateTime(2023, 2, 26, 20),
           getUpTime: DateTime(2023, 2, 24, 6),
           memo: ''),
-    ]
+    ]*/
   };
 
   Map<DateTime, List<Money>> moneyMap = {
