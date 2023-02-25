@@ -41,7 +41,7 @@ class _ChartPageState extends State<ChartPage> {
         children: [
           Padding(
             // graph
-            padding: const EdgeInsets.only(left: 30, top: 20, right: 30),
+            padding: const EdgeInsets.only(left: 30, right: 30),
             child: SfCartesianChart(
                 title: ChartTitle(text: '貯金額の遷移'), // タイトル
                 legend: Legend(isVisible: true), // 凡例の表示
@@ -69,7 +69,7 @@ class _ChartPageState extends State<ChartPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 50),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: DropdownButton(
                   style: const TextStyle(fontSize: 15.0, color: Colors.black),
                   items: const [
@@ -90,30 +90,29 @@ class _ChartPageState extends State<ChartPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 50),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: Text('今月の目標金額：$isSelectedItem 円'),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 30, bottom: 50),
-                child: SizedBox(
-                  height: 50,
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: buttonPressed,
-                    child: const Text(
-                      '貯金額を確認する',
-                      style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w100,
-                          fontFamily: "Roboto"),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange),
-                  ),
-                ),
-              ),
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: SizedBox(
+              height: 50,
+              width: 100,
+              child: ElevatedButton(
+                onPressed: buttonPressed,
+                child: const Text(
+                  '貯金額を確認する',
+                  style: TextStyle(
+                      fontSize: 8.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w100,
+                      fontFamily: "Roboto"),
+                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              ),
+            ),
           ),
           SizedBox(
             height: 200,
@@ -151,7 +150,7 @@ class _ChartPageState extends State<ChartPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) =>
-          const AlertDialog(title: Text('あなたの貯金額は？？円です')),
+          const AlertDialog(title: Text('あなたの貯金額は円です')),
     );
   }
 }

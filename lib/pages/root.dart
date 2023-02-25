@@ -13,6 +13,7 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
+  bool _shouldShowBlack = false;
   final _screens = [
     CalendarView(), 
     ScheduleView(
@@ -57,36 +58,47 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          if (index == 3) {
-            setAlarm(DateTime.now().add(const Duration(seconds: 5)));
-          }
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        selectedIndex: _currentIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month),
-            label: 'カレンダー',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.view_list),
-            label: 'スケジュール',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart),
-            label: 'グラフ',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.alarm),
-            label: 'アラーム',
-          ),
-        ],
+    return GestureDetector(
+      onDoubleTap: () {
+        setState(() {
+          _shouldShowBlack = !_shouldShowBlack;
+        });
+      },
+      child: _shouldShowBlack
+      ? Container(
+              color: Colors.black,
+            )
+      : Scaffold(
+        body: _screens[_currentIndex],
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            if (index == 3) {
+              setAlarm(DateTime.now().add(const Duration(seconds: 5)));
+            }
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          selectedIndex: _currentIndex,
+          destinations: const <Widget>[
+            NavigationDestination(
+              icon: Icon(Icons.calendar_month),
+              label: 'カレンダー',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.view_list),
+              label: 'スケジュール',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bar_chart),
+              label: 'グラフ',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.alarm),
+              label: 'アラーム',
+            ),
+          ],
+        ),
       ),
     );
   }

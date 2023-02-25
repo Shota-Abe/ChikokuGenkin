@@ -16,12 +16,31 @@ class _AlarmViewState extends State<AlarmView> {
       appBar: AppBar(
         title: const Text('アラーム'),
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            TextButton(onPressed: () async {
-              await Alarm.stop();
-            }, child: const Text("ボタン"),)
+            const TextField(
+                        decoration: InputDecoration(hintText: '収入を入力'),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const TextField(
+                        decoration: InputDecoration(hintText: '支出を入力'),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          bool hasAlarm = await Alarm.hasAlarm();
+                          if (hasAlarm) {
+                            await Alarm.stop();
+                          }
+                        },
+                        child: const Text("ストップ"),
+                      )
           ],
         ),
       ),
