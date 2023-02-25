@@ -24,8 +24,7 @@ class _CalendarViewState extends State<CalendarView> {
   late DateTime selectedDate; //選択した日付
   late int initialIndex; //ページ遷移数
   int monthDuration = 0;
-
-  late int id;
+  late int selectID;
 
   DateTime? selectedStartTime;
   DateTime? selectedEndTime;
@@ -55,6 +54,8 @@ class _CalendarViewState extends State<CalendarView> {
   Map<DateTime, List<Schedule>> scheduleMap = {};
 
   Map<DateTime, List<Money>> moneyMap = {};
+
+  final List<int> idList = [];
 
   void selectDate(DateTime cacheDate) {
     selectedDate = cacheDate;
@@ -210,7 +211,7 @@ class _CalendarViewState extends State<CalendarView> {
 
                     await scheduleDb.createSchedule(newSchedule);
                     getFirstSchedule();
-                    print(await scheduleDb.getAllSchedule());
+                    //print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
                     Navigator.pop(context, true);
@@ -358,7 +359,7 @@ class _CalendarViewState extends State<CalendarView> {
 
                     await MoneyDb.createMoney(newmoneyManager);
 
-                    print(await MoneyDb.getAllMoney());
+                    //print(await MoneyDb.getAllMoney());
                     Navigator.pop(context, true);
                   },
                   icon: const Icon(Icons.check_circle),
@@ -707,7 +708,7 @@ class _CalendarViewState extends State<CalendarView> {
     scheduleMap.clear();
 
     final items = (await scheduleDb.getAllSchedule());
-    print(items);
+    //print(items);
 
     late List<String> dateAndTime;
     int year;
@@ -715,113 +716,119 @@ class _CalendarViewState extends State<CalendarView> {
     int day;
     int hour;
     int minute;
+    int id;
 
     for (int i = 0; i < items.length; i++) {
-      final itemList = await scheduleDb.getSchedule(i + 1);
-      final itemGetMap = itemList[0];
-      print(itemGetMap);
-      // ignore: unnecessary_null_comparison
-      if (itemGetMap != null) {
-        final itemGetTitle = itemGetMap['title'] as String;
-        final itemGetStratAtString = itemGetMap['startAt'] as String;
-        dateAndTime = itemGetStratAtString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
+      id = items[i]['id'];
+      final itemList = await scheduleDb.getSchedule(id);
+      if (itemList != null) {
+        final itemGetMap = itemList[0];
+        //print(itemGetMap);
+        // ignore: unnecessary_null_comparison
+        if (itemGetMap != null) {
+          final itemGetTitle = itemGetMap['title'] as String;
+          final itemGetStratAtString = itemGetMap['startAt'] as String;
+          dateAndTime = itemGetStratAtString.split('-');
+          year = int.parse(dateAndTime[0]);
+          month = int.parse(dateAndTime[1]);
+          day = int.parse(dateAndTime[2]);
+          if (dateAndTime[3].length == 4) {
+            hour = int.parse(dateAndTime[3].substring(0, 2));
+            minute = int.parse(dateAndTime[3].substring(2, 4));
+          } else if (dateAndTime[3].length == 3 &&
+              int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else if (dateAndTime[3].length == 3) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 2));
+          }
+          List<int> dateTimeList = [year, month, day, hour, minute];
+          //print(dateTimeList);
+          final getStartAt = DateTime(dateTimeList[0], dateTimeList[1],
+              dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+
+          final itemGetEndAtString = itemGetMap['endAt'] as String;
+          dateAndTime = itemGetEndAtString.split('-');
+          year = int.parse(dateAndTime[0]);
+          month = int.parse(dateAndTime[1]);
+          day = int.parse(dateAndTime[2]);
+          if (dateAndTime[3].length == 4) {
+            hour = int.parse(dateAndTime[3].substring(0, 2));
+            minute = int.parse(dateAndTime[3].substring(2, 4));
+          } else if (dateAndTime[3].length == 3 &&
+              int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else if (dateAndTime[3].length == 3) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 2));
+          }
+
+          dateTimeList = [year, month, day, hour, minute];
+          //print(dateTimeList);
+          final getEndAt = DateTime(dateTimeList[0], dateTimeList[1],
+              dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+
+          final itemGetGetUpTimeString = itemGetMap['getUpTime'] as String;
+          dateAndTime = itemGetGetUpTimeString.split('-');
+          year = int.parse(dateAndTime[0]);
+          month = int.parse(dateAndTime[1]);
+          day = int.parse(dateAndTime[2]);
+          if (dateAndTime[3].length == 4) {
+            hour = int.parse(dateAndTime[3].substring(0, 2));
+            minute = int.parse(dateAndTime[3].substring(2, 4));
+          } else if (dateAndTime[3].length == 3 &&
+              int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else if (dateAndTime[3].length == 3) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 3));
+          } else if (dateAndTime[3].length == 2) {
+            hour = int.parse(dateAndTime[3].substring(0, 1));
+            minute = int.parse(dateAndTime[3].substring(1, 2));
+          }
+          dateTimeList = [year, month, day, hour, minute];
+          //print(dateTimeList);
+
+          final getGetUpTime = DateTime(dateTimeList[0], dateTimeList[1],
+              dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+          final String itemGetMemo;
+          if (itemGetMap['memo'] != null) {
+            itemGetMemo = itemGetMap['memo'] as String;
+          } else {
+            itemGetMemo = '';
+          }
+
+          final getSceduleItem = Schedule(
+              title: itemGetTitle,
+              startAt: getStartAt,
+              endAt: getEndAt,
+              getUpTime: getGetUpTime,
+              memo: itemGetMemo);
+
+          DateTime checkScheduleTime = DateTime(getSceduleItem.startAt.year,
+              getSceduleItem.startAt.month, getSceduleItem.startAt.day);
+
+          if (scheduleMap.containsKey(checkScheduleTime)) {
+            scheduleMap[checkScheduleTime]!.add(getSceduleItem);
+          } else {
+            scheduleMap[
+                DateTime(getStartAt.year, getStartAt.month, getStartAt.day)] = [
+              getSceduleItem
+            ];
+          }
+          //print(scheduleMap);
+
+          idList.add(id);
         }
-        List<int> dateTimeList = [year, month, day, hour, minute];
-        print(dateTimeList);
-        final getStartAt = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-
-        final itemGetEndAtString = itemGetMap['endAt'] as String;
-        dateAndTime = itemGetEndAtString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
-        }
-
-        dateTimeList = [year, month, day, hour, minute];
-        print(dateTimeList);
-        final getEndAt = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-
-        final itemGetGetUpTimeString = itemGetMap['getUpTime'] as String;
-        dateAndTime = itemGetGetUpTimeString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 2) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
-        }
-        dateTimeList = [year, month, day, hour, minute];
-        print(dateTimeList);
-
-        final getGetUpTime = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-        final String itemGetMemo;
-        if (itemGetMap['memo'] != null) {
-          itemGetMemo = itemGetMap['memo'] as String;
-        } else {
-          itemGetMemo = '';
-        }
-
-        final getSceduleItem = Schedule(
-            title: itemGetTitle,
-            startAt: getStartAt,
-            endAt: getEndAt,
-            getUpTime: getGetUpTime,
-            memo: itemGetMemo);
-
-        DateTime checkScheduleTime = DateTime(getSceduleItem.startAt.year,
-            getSceduleItem.startAt.month, getSceduleItem.startAt.day);
-
-        if (scheduleMap.containsKey(checkScheduleTime)) {
-          scheduleMap[checkScheduleTime]!.add(getSceduleItem);
-        } else {
-          scheduleMap[
-              DateTime(getStartAt.year, getStartAt.month, getStartAt.day)] = [
-            getSceduleItem
-          ];
-        }
-        print(scheduleMap);
       }
     }
     setState(() {});
@@ -849,13 +856,14 @@ class _CalendarViewState extends State<CalendarView> {
   }
 
   void deleteSchedule(
-      {required int index, required Schedule selectedSchedule}) {
+      {required int index, required Schedule selectedSchedule}) async {
     scheduleMap[DateTime(
       selectedSchedule.startAt.year,
       selectedSchedule.startAt.month,
       selectedSchedule.startAt.day,
     )]!
         .removeAt(index);
+    await scheduleDb.deleteSchedule(selectID);
     setState(() {});
   }
 
