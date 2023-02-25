@@ -61,7 +61,7 @@ class ChartPageState extends State<ChartPage> {
                         yValueMapper: (_ChartData data, _) => data.y,
                         name: '貯\n金\n額',
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(15)),
+                            const BorderRadius.all(Radius.circular(5)),
                         width: 0.2,
                         color: Colors.green,
                         dataLabelSettings: const DataLabelSettings(
