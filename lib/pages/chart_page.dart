@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+
 class ChartPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
   ChartPage({Key? key}) : super(key: key);
 
   @override
-  _ChartPageState createState() => _ChartPageState();
+  ChartPageState createState() => ChartPageState();
 }
 
-class _ChartPageState extends State<ChartPage> {
+class ChartPageState extends State<ChartPage> {
   late List<_ChartData> data;
   late TooltipBehavior _tooltip;
   String? isSelectedItem = '50000';
   final now = DateTime.now();
+  var _editText = '';
+  var _alertText = '';
 
   @override
   void initState() {
@@ -70,49 +73,75 @@ class _ChartPageState extends State<ChartPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 0),
-                child: DropdownButton(
-                  style: const TextStyle(fontSize: 15.0, color: Colors.black),
-                  items: const [
-                    DropdownMenuItem(
-                        child: Text('50000',
-                            style: TextStyle(color: Colors.black)),
-                        value: '50000'),
-                    DropdownMenuItem(child: Text('60000'), value: '60000'),
-                    DropdownMenuItem(child: Text('70000'), value: '70000'),
-                    DropdownMenuItem(child: Text('80000'), value: '80000'),
-                  ],
-                  onChanged: (String? value) {
-                    setState(() {
-                      isSelectedItem = value;
-                    });
-                  },
-                  value: isSelectedItem,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 0),
-                child: Text('今月の目標金額：$isSelectedItem 円'),
+                child: Text('今月の目標金額： $_alertText円'),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 30),
-            child: SizedBox(
-              height: 50,
-              width: 100,
-              child: ElevatedButton(
-                onPressed: buttonPressed,
-                child: const Text(
-                  '貯金額を確認する',
-                  style: TextStyle(
-                      fontSize: 8.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w100,
-                      fontFamily: "Roboto"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: SizedBox(
+                  height: 50,
+                  width: 100,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                                title: Text('Alert'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _editText = value;
+                                    });
+                                  },
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('キャンセル'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _alertText = _editText;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              ));
+                    },
+                    child:
+                        Text('目標金額を\n設定する', style: TextStyle(fontSize: 10.0)),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  ),
                 ),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               ),
-            ),
+              SizedBox(
+                height: 50,
+                width: 100,
+                child: ElevatedButton(
+                  onPressed: buttonPressed1,
+                  child: const Text(
+                    '貯金額を\n確認する',
+                    style: TextStyle(
+                        fontSize: 10.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100,
+                        fontFamily: "Roboto"),
+                  ),
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                ),
+              ),
+            ],
           ),
           SizedBox(
             height: 200,
@@ -146,7 +175,7 @@ class _ChartPageState extends State<ChartPage> {
     ));
   }
 
-  void buttonPressed() {
+  void buttonPressed1() {
     showDialog(
       context: context,
       builder: (BuildContext context) =>
