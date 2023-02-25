@@ -54,7 +54,7 @@ class _AlarmViewState extends State<AlarmView> {
 
   Future<void> onStopButtonTapped() async {
     await Alarm.stop();
-      await save(Money(revenue: revenue, expenditure: expenditure));
+      await save(Money(revenue: revenue, expenditure: expenditure, date: DateTime.now()));
   }
 
   @override
