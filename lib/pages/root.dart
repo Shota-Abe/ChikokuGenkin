@@ -5,6 +5,8 @@ import 'package:calendar_hackathon/pages/chart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_hackathon/pages/sheduleView.dart';
 
+import '../model/schedule.dart';
+
 class Root extends StatefulWidget {
   @override
   _RootState createState() => _RootState();
@@ -12,7 +14,30 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
-  final _screens = [CalendarView(), scheduleView(), ChartPage(), AlarmView()];
+  final _screens = [
+    CalendarView(),
+    scheduleView(
+      scheduleMap: {
+        //スケジュール
+        DateTime(2023, 2, 24): [
+          Schedule(
+              title: 'ハッカソン',
+              startAt: DateTime(2023, 2, 24, 10),
+              endAt: DateTime(2023, 2, 26, 20),
+              getUpTime: DateTime(2023, 2, 24, 6),
+              memo: ''),
+          Schedule(
+              title: 'プログラミング',
+              startAt: DateTime(2023, 2, 24, 10),
+              endAt: DateTime(2023, 2, 26, 20),
+              getUpTime: DateTime(2023, 2, 24, 6),
+              memo: ''),
+        ]
+      },
+    ),
+    ChartPage(),
+    AlarmView()
+  ];
 
   @override
   void initState() {

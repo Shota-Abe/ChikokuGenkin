@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class scheduleView extends StatefulWidget {
-  const scheduleView({Key? key}) : super(key: key);
+  const scheduleView({Key? key, required this.scheduleMap}) : super(key: key);
+  final Map<DateTime, List<Schedule>> scheduleMap;
 
   @override
   State<scheduleView> createState() => _scheduleViewState();
@@ -11,8 +12,6 @@ class scheduleView extends StatefulWidget {
 
 class _scheduleViewState extends State<scheduleView> {
   late DateTime selectedList;
-
-  List<String> titelList = ['suchedule1', 'suchedule2', 'suchedule3'];
 
   final List<Schedule> scheduleListItem = [
     //スケジュール
