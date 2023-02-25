@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-
 class ChartPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
   ChartPage({Key? key}) : super(key: key);
@@ -37,130 +36,133 @@ class ChartPageState extends State<ChartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('貯金'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            // graph
-            padding: const EdgeInsets.only(left: 30, right: 30),
-            child: SfCartesianChart(
-                title: ChartTitle(text: '貯金額の遷移'), // タイトル
-                legend: Legend(isVisible: true), // 凡例の表示
+        appBar: AppBar(
+          title: const Text('貯金'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                // graph
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: SfCartesianChart(
+                    title: ChartTitle(text: '貯金額の遷移'), // タイトル
+                    legend: Legend(isVisible: true), // 凡例の表示
 
-                primaryXAxis: CategoryAxis(),
-                primaryYAxis:
-                    NumericAxis(minimum: 0, maximum: 150000, interval: 50000),
-                tooltipBehavior: _tooltip,
-                series: <ChartSeries<_ChartData, String>>[
-                  ColumnSeries<_ChartData, String>(
-                    dataSource: data,
-                    xValueMapper: (_ChartData data, _) => data.x,
-                    yValueMapper: (_ChartData data, _) => data.y,
-                    name: '貯\n金\n額',
-                    borderRadius: const BorderRadius.all(Radius.circular(15)),
-                    width: 0.2,
-                    color: Colors.green,
-                    dataLabelSettings:
-                        const DataLabelSettings(isVisible: true), // データ数値の表示
-                  )
-                ]),
-          ),
-          Row(
-            // button
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 0),
-                child: Text('今月の目標金額： $_alertText円'),
+                    primaryXAxis: CategoryAxis(),
+                    primaryYAxis: NumericAxis(
+                        minimum: 0, maximum: 150000, interval: 50000),
+                    tooltipBehavior: _tooltip,
+                    series: <ChartSeries<_ChartData, String>>[
+                      ColumnSeries<_ChartData, String>(
+                        dataSource: data,
+                        xValueMapper: (_ChartData data, _) => data.x,
+                        yValueMapper: (_ChartData data, _) => data.y,
+                        name: '貯\n金\n額',
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(15)),
+                        width: 0.2,
+                        color: Colors.green,
+                        dataLabelSettings: const DataLabelSettings(
+                            isVisible: true), // データ数値の表示
+                      )
+                    ]),
               ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: SizedBox(
-                  height: 50,
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                                title: Text('Alert'),
-                                content: TextField(
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _editText = value;
-                                    });
-                                  },
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('キャンセル'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _alertText = _editText;
-                                      });
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('OK'),
-                                  ),
-                                ],
-                              ));
-                    },
-                    child:
-                        Text('目標金額を\n設定する', style: TextStyle(fontSize: 10.0)),
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              Row(
+                // button
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 0),
+                    child: Text('今月の目標金額： $_alertText円'),
                   ),
-                ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: SizedBox(
+                      height: 50,
+                      width: 100,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                    title: Text('Alert'),
+                                    content: TextField(
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _editText = value;
+                                        });
+                                      },
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('キャンセル'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _alertText = _editText;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ));
+                        },
+                        child: Text('目標金額を\n設定する',
+                            style: TextStyle(fontSize: 10.0)),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: buttonPressed1,
+                      child: const Text(
+                        '貯金額を\n確認する',
+                        style: TextStyle(
+                            fontSize: 10.0,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w100,
+                            fontFamily: "Roboto"),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
-                height: 50,
-                width: 100,
-                child: ElevatedButton(
-                  onPressed: buttonPressed1,
-                  child: const Text(
-                    '貯金額を\n確認する',
-                    style: TextStyle(
-                        fontSize: 10.0,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100,
-                        fontFamily: "Roboto"),
+                height: 200,
+                width: 500,
+                child: Scrollbar(
+                  thickness: 12,
+                  isAlwaysShown: true,
+                  radius: const Radius.circular(20),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 40),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
+                    itemCount: 30,
+                    itemBuilder: (context, index) => _buildCard(index + 1),
                   ),
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.orange),
                 ),
-              ),
+              )
             ],
           ),
-          SizedBox(
-            height: 200,
-            width: 500,
-            child: Scrollbar(
-              thickness: 12,
-              isAlwaysShown: true,
-              radius: const Radius.circular(20),
-              child: ListView.separated(
-                padding: const EdgeInsets.only(bottom: 40),
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemCount: 30,
-                itemBuilder: (context, index) => _buildCard(index + 1),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+        ));
   }
 
   @override
