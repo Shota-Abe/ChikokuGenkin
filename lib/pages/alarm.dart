@@ -15,7 +15,7 @@ class _AlarmViewState extends State<AlarmView> {
   final _focusNode = FocusNode();
   final _focusNode2 = FocusNode();
   bool _isKeyboardVisible = false;
-  int income = 0;
+  int revenue = 0;
   int expenditure = 0;
 
   @override
@@ -47,7 +47,7 @@ class _AlarmViewState extends State<AlarmView> {
 
   Future<void> save(Money money) async {
     final id = await MoneyDb.createMoney(money);
-    print(id);
+    print(await MoneyDb.getMoney(id));
   }
 
   @override
@@ -68,7 +68,7 @@ class _AlarmViewState extends State<AlarmView> {
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               ],
               onChanged: (String value) {
-                income = int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
+                revenue = int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
               },
             ),
             const SizedBox(
@@ -82,7 +82,8 @@ class _AlarmViewState extends State<AlarmView> {
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               ],
               onChanged: (String value) {
-                expenditure = int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
+                expenditure =
+                    int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
               },
             ),
             const SizedBox(
@@ -93,6 +94,7 @@ class _AlarmViewState extends State<AlarmView> {
                 bool hasAlarm = await Alarm.hasAlarm();
                 if (hasAlarm) {
                   await Alarm.stop();
+                  await save(Money(revenue: revenue, expenditure: expenditure));
                 }
               },
               child: const Text("ストップ"),
