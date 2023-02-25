@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Alert {
   final List<String> Emoticon = ['😆', '😀', '🙂', '😥', '😱'];
   final int targetSpend = 30000; //目標支出
