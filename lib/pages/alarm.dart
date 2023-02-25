@@ -17,6 +17,8 @@ class _AlarmViewState extends State<AlarmView> {
   bool _isKeyboardVisible = false;
   int revenue = 0;
   int expenditure = 0;
+  String _revenueString = "";
+  String _expenditureString = "";
 
   @override
   void initState() {
@@ -50,6 +52,14 @@ class _AlarmViewState extends State<AlarmView> {
     print(await MoneyDb.getMoney(id));
   }
 
+  Future<void> onStopButtonTapped() async {
+    bool hasAlarm = await Alarm.hasAlarm();
+    if (hasAlarm) {
+      await Alarm.stop();
+      await save(Money(revenue: revenue, expenditure: expenditure));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +79,9 @@ class _AlarmViewState extends State<AlarmView> {
               ],
               onChanged: (String value) {
                 revenue = int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
+                setState(() {
+                  _revenueString = value;
+                });
               },
             ),
             const SizedBox(
@@ -84,19 +97,18 @@ class _AlarmViewState extends State<AlarmView> {
               onChanged: (String value) {
                 expenditure =
                     int.tryParse(value) ?? 0; // 入力された文字列をint型に変換して代入する
+                setState(() {
+                  _expenditureString = value;
+                });
               },
             ),
             const SizedBox(
               height: 20,
             ),
             ElevatedButton(
-              onPressed: () async {
-                bool hasAlarm = await Alarm.hasAlarm();
-                if (hasAlarm) {
-                  await Alarm.stop();
-                  await save(Money(revenue: revenue, expenditure: expenditure));
-                }
-              },
+              onPressed: (_revenueString == "" || _expenditureString == "")
+                  ? null
+                  : onStopButtonTapped,
               child: const Text("ストップ"),
             ),
             const Spacer(),
