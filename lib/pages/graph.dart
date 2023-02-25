@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:calendar_hackathon/model/schedule.dart';
 
 void main() {
-  return runApp(_ChartApp());
+  return runApp(const MyApp());
 }
 
-class _ChartApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -79,24 +79,14 @@ class _MyHomePageState extends State<_MyHomePage> {
                 ]),
           ),
           DropdownButton(
-            style: TextStyle(fontSize: 15.0),
+            style: const TextStyle(fontSize: 15.0, color: Colors.black),
             items: const [
               DropdownMenuItem(
-                child: Text('50000'),
-                value: '50000',
-              ),
-              DropdownMenuItem(
-                child: Text('60000'),
-                value: '60000',
-              ),
-              DropdownMenuItem(
-                child: Text('70000'),
-                value: '70000',
-              ),
-              DropdownMenuItem(
-                child: Text('80000'),
-                value: '80000',
-              ),
+                  child: Text('50000', style: TextStyle(color: Colors.black)),
+                  value: '50000'),
+              DropdownMenuItem(child: Text('60000'), value: '60000'),
+              DropdownMenuItem(child: Text('70000'), value: '70000'),
+              DropdownMenuItem(child: Text('80000'), value: '80000'),
             ],
             onChanged: (String? value) {
               setState(() {
@@ -105,9 +95,27 @@ class _MyHomePageState extends State<_MyHomePage> {
             },
             value: isSelectedItem,
           ),
-          Text('今月の目標金額：$isSelectedItem 円')
+          Text('今月の目標金額：$isSelectedItem 円です'),
+          ElevatedButton(
+              onPressed: buttonPressed,
+              child: const Text(
+                '貯金額を確認する',
+                style: TextStyle(
+                    fontSize: 32.0,
+                    color: Colors.red,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Roboto"),
+              )),
         ],
       ),
+    );
+  }
+
+  void buttonPressed() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) =>
+          const AlertDialog(title: Text('あなたの貯金額は？？円です')),
     );
   }
 }
