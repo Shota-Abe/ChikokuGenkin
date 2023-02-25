@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/services.dart';
+import 'package:calendar_hackathon/model/targetSpendIo.dart';
+import 'package:calendar_hackathon/model/savingsIo.dart';
 
 class ChartPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
@@ -13,16 +15,26 @@ class ChartPage extends StatefulWidget {
 class ChartPageState extends State<ChartPage> {
   late List<_ChartData> data;
   late TooltipBehavior _tooltip;
-  String? isSelectedItem = '50000';
+  final targetSpendIo tSIo = targetSpendIo();
+  final savingsManagement savings = savingsManagement();
   final now = DateTime.now();
-  var _editText = '';
-  var _alertText = '';
+  String _editText = '';
+  String _alertText = '';
+  int _saveValue = 0;
 
   @override
   void initState() {
+    Future(() async {
+      String targetSpend = '${await tSIo.getTargetSpend()}';
+      int save = await savings.getSavings();
+      setState(() {
+        _alertText = targetSpend;
+        _saveValue = save;
+      });
+    });
     //initStateはウィジェット作成時の初期値
     data = [
-      _ChartData('月', 100000),
+      _ChartData('月', 0),
       _ChartData('火', 0),
       _ChartData('水', 0),
       _ChartData('木', 0),
@@ -40,8 +52,8 @@ class ChartPageState extends State<ChartPage> {
         appBar: AppBar(
           title: const Text('貯金'),
         ),
-        body: SingleChildScrollView (
-          child: Column (
+        body: SingleChildScrollView(
+          child: Column(
             children: [
               Padding(
                 // graph
@@ -101,7 +113,7 @@ class ChartPageState extends State<ChartPage> {
                                         LengthLimitingTextInputFormatter(10),
                                         FilteringTextInputFormatter.digitsOnly,
                                       ],
-                                      onChanged: (value) {
+                                      onChanged: (value) async {
                                         setState(() {
                                           _editText = value;
                                         });
@@ -115,11 +127,13 @@ class ChartPageState extends State<ChartPage> {
                                         child: Text('キャンセル'),
                                       ),
                                       TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          await tSIo.setTargetSpend(
+                                              int.tryParse(_editText) ?? 0);
                                           setState(() {
                                             _alertText = _editText;
+                                            Navigator.pop(context);
                                           });
-                                          Navigator.pop(context);
                                         },
                                         child: Text('OK'),
                                       ),
@@ -192,7 +206,7 @@ class ChartPageState extends State<ChartPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) =>
-          const AlertDialog(title: Text('あなたの貯金額は円です')),
+          AlertDialog(title: Text('あなたの貯金額は$_saveValue円です')),
     );
   }
 }

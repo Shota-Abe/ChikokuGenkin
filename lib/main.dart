@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'pages/root.dart';
+import 'package:calendar_hackathon/model/dbIo.dart';
+import 'package:calendar_hackathon/model/schedule.dart';
+import 'package:calendar_hackathon/model/moneyManagemant.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
