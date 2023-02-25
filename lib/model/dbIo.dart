@@ -60,9 +60,9 @@ class scheduleDb {
 
     final data = {
       'title': sch.title,
-      'startAt': DateFormat('yyyy-MM-dd-Hm').format(sch.startAt),
-      'endAt': DateFormat('yyyy-MM-dd-Hm').format(sch.endAt),
-      'getUpTime': DateFormat('yyyy-MM-dd-Hm').format(sch.getUpTime),
+      'startAt': DateFormat('yyyyMMddHm').format(sch.startAt),
+      'endAt': DateFormat('yyyyMMddHm').format(sch.endAt),
+      'getUpTime': DateFormat('yyyyMMddHm').format(sch.getUpTime),
       'memo': sch.memo
     };
 
@@ -139,7 +139,8 @@ class MoneyDb {
     await moneyDb.execute('''CREATE TABLE money(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         revenue INTEGER,
-        expenditure INTEGER
+        expenditure INTEGER,
+        date TEXT
       )
     ''');
   }
@@ -157,7 +158,11 @@ class MoneyDb {
   static Future<int> createMoney(Money money) async {
     final moneyDb = await MoneyDb.db();
 
-    final data = {'revenue': money.revenue, 'expenditure': money.expenditure};
+    final data = {
+      'revenue': money.revenue,
+      'expenditure': money.expenditure,
+      'date': DateFormat('yyyyMMdd').format(money.date)
+    };
 
     final id = await moneyDb.insert('money', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -178,7 +183,11 @@ class MoneyDb {
   static Future<int> updateMoney(int id, Money money) async {
     final moneyDb = await MoneyDb.db();
 
-    final data = {'revenue': money.revenue, 'expenditure': money.expenditure};
+    final data = {
+      'revenue': money.revenue,
+      'expenditure': money.expenditure,
+      'date': DateFormat('yyyy-MM-dd').format(money.date)
+    };
 
     final result =
         await moneyDb.update('money', data, where: 'id = ?', whereArgs: [id]);

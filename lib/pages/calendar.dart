@@ -1,5 +1,7 @@
 import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
+import 'package:calendar_hackathon/model/dbIo.dart';
+import 'package:sqflite/sqlite_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,25 +53,11 @@ class _CalendarViewState extends State<CalendarView> {
 
   Map<DateTime, List<Schedule>> scheduleMap = {
     //スケジュール
-    /*DateTime(2023, 2, 24): [
-      Schedule(
-          title: 'ハッカソン',
-          startAt: DateTime(2023, 2, 24, 10),
-          endAt: DateTime(2023, 2, 26, 20),
-          getUpTime: DateTime(2023, 2, 24, 6),
-          memo: ''),
-      Schedule(
-          title: 'プログラミング',
-          startAt: DateTime(2023, 2, 24, 10),
-          endAt: DateTime(2023, 2, 26, 20),
-          getUpTime: DateTime(2023, 2, 24, 6),
-          memo: ''),
-    ]*/
   };
 
   Map<DateTime, List<Money>> moneyMap = {
     DateTime(2023, 2, 24): [
-      Money(revenue: 0, expenditure: 2000),
+      Money(revenue: 0, expenditure: 2000, date: DateTime(2023, 2, 26)),
     ]
   };
 
@@ -211,7 +199,7 @@ class _CalendarViewState extends State<CalendarView> {
                 )),
                 IconButton(
                   splashRadius: 10,
-                  onPressed: () {
+                  onPressed: () async {
                     //スケジュールを追加する処理
                     if (!validationIsOk()) {
                       return;
@@ -221,17 +209,15 @@ class _CalendarViewState extends State<CalendarView> {
                         selectedStartTime!.year,
                         selectedStartTime!.month,
                         selectedStartTime!.day);
+
                     Schedule newSchedule = Schedule(
                         title: titelContoroller.text,
                         startAt: selectedStartTime!,
                         endAt: selectedEndTime!,
                         getUpTime: getUpTime!,
                         memo: '');
-                    if (scheduleMap.containsKey(checkScheduleTime)) {
-                      scheduleMap[checkScheduleTime]!.add(newSchedule);
-                    } else {
-                      scheduleMap[checkScheduleTime] = [newSchedule];
-                    }
+                    await scheduleDb.createSchedule(newSchedule);
+                    print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
                     Navigator.pop(context, true);
@@ -373,7 +359,9 @@ class _CalendarViewState extends State<CalendarView> {
                         selectedDate.month, selectedDate.day);
                     Money newmoneyManager = Money(
                         revenue: int.parse(revenueContoroller.text),
-                        expenditure: int.parse(expenditureContoroller.text));
+                        expenditure: int.parse(expenditureContoroller.text),
+                        date: DateTime(selectedDate.year, selectedDate.month,
+                            selectedDate.day));
 
                     if (moneyMap.containsKey(checkScheduleTime)) {
                       moneyMap[checkScheduleTime]!.add(newmoneyManager);

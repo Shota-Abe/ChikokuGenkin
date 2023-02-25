@@ -1,22 +1,13 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:calendar_hackathon/model/savingsIo.dart';
+import 'package:calendar_hackathon/model/targetSpendIo.dart';
 
 class Alert {
   final List<String> Emoticon = ['😆', '😀', '🙂', '😥', '😱'];
 
-  Future setTargetSpend(int targetSpend) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('targetSpend', targetSpend);
-  }
-
-  Future<int> getTargetSpend() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    int rtn = await prefs.getInt('targetSpend') ?? 0;
-    return rtn;
-  }
-
   Future<int> rtnState(int spend) async {
+    targetSpendIo tSIo = targetSpendIo();
     int subscript;
-    int targetSpend = await getTargetSpend(); //目標支出
+    int targetSpend = await tSIo.getTargetSpend(); //目標支出
 
     for (subscript = 1; subscript < 5; subscript++) {
       if (spend < subscript * targetSpend * 2 / 5) {
