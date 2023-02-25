@@ -1,21 +1,30 @@
-import 'package:calendar_hackathon/pages/calendar.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:alarm/alarm.dart';
+import 'package:flutter/services.dart';
+import 'package:wakelock/wakelock.dart';
+
+import 'pages/root.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  Wakelock.disable();
+
+  await Alarm.init();
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const CalendarView(),
+      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
+      // home: const CalendarView(),
+      home: Root(),
     );
   }
 }
