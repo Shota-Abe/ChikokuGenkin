@@ -3,6 +3,7 @@ import 'package:calendar_hackathon/pages/alarm.dart';
 import 'package:calendar_hackathon/pages/calendar.dart';
 import 'package:calendar_hackathon/pages/chart_page.dart';
 import 'package:flutter/material.dart';
+import 'package:calendar_hackathon/pages/sheduleView.dart';
 
 class Root extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
-  final _screens = [CalendarView(), ChartPage(), AlarmView()];
+  final _screens = [CalendarView(), scheduleView(), ChartPage(), AlarmView()];
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class _RootState extends State<Root> {
         onDestinationSelected: (int index) {
           setState(() {
             _currentIndex = index;
-            if (index == 2) {
+            if (index == 3) {
               setAlarm(DateTime.now().add(const Duration(seconds: 5)));
             }
           });
@@ -49,6 +50,10 @@ class _RootState extends State<Root> {
           NavigationDestination(
             icon: Icon(Icons.calendar_month),
             label: 'カレンダー',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.view_list),
+            label: 'スケジュール',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart),
