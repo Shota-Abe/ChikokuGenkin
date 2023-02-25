@@ -40,6 +40,7 @@ dependencies:
   syncfusion_flutter_charts: ^20.4.51
   alarm: ^0.1.2
   wakelock: ^0.6.2
+  sensors: ^2.0.3
 
 dev_dependencies:
   flutter_test:
