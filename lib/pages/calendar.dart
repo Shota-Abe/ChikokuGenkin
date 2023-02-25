@@ -1,7 +1,6 @@
 import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
 import 'package:calendar_hackathon/model/dbIo.dart';
-import 'package:sqflite/sqlite_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +24,8 @@ class _CalendarViewState extends State<CalendarView> {
   late DateTime selectedDate; //選択した日付
   late int initialIndex; //ページ遷移数
   int monthDuration = 0;
+
+  late int id;
 
   DateTime? selectedStartTime;
   DateTime? selectedEndTime;
@@ -51,15 +52,9 @@ class _CalendarViewState extends State<CalendarView> {
 
   bool isSettingStartTime = true;
 
-  Map<DateTime, List<Schedule>> scheduleMap = {
-    //スケジュール
-  };
+  Map<DateTime, List<Schedule>> scheduleMap = {};
 
-  Map<DateTime, List<Money>> moneyMap = {
-    DateTime(2023, 2, 24): [
-      Money(revenue: 0, expenditure: 2000, date: DateTime(2023, 2, 26)),
-    ]
-  };
+  Map<DateTime, List<Money>> moneyMap = {};
 
   void selectDate(DateTime cacheDate) {
     selectedDate = cacheDate;
@@ -70,6 +65,7 @@ class _CalendarViewState extends State<CalendarView> {
   //ページの始まり
   void initState() {
     super.initState();
+    getFirstSchedule();
 
     yearOption = [now.year];
     for (int i = 1; i < 10; i++) {
@@ -205,18 +201,15 @@ class _CalendarViewState extends State<CalendarView> {
                       return;
                     }
 
-                    DateTime checkScheduleTime = DateTime(
-                        selectedStartTime!.year,
-                        selectedStartTime!.month,
-                        selectedStartTime!.day);
-
                     Schedule newSchedule = Schedule(
                         title: titelContoroller.text,
                         startAt: selectedStartTime!,
                         endAt: selectedEndTime!,
                         getUpTime: getUpTime!,
                         memo: '');
+
                     await scheduleDb.createSchedule(newSchedule);
+                    getFirstSchedule();
                     print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
@@ -363,12 +356,8 @@ class _CalendarViewState extends State<CalendarView> {
                         date: DateTime(selectedDate.year, selectedDate.month,
                             selectedDate.day));
 
-                    if (moneyMap.containsKey(checkScheduleTime)) {
-                      moneyMap[checkScheduleTime]!.add(newmoneyManager);
-                    } else {
-                      moneyMap[checkScheduleTime] = [newmoneyManager];
-                    }
                     await MoneyDb.createMoney(newmoneyManager);
+
                     print(await MoneyDb.getAllMoney());
                     Navigator.pop(context, true);
                   },
@@ -714,6 +703,130 @@ class _CalendarViewState extends State<CalendarView> {
     }
   }
 
+  Future<void> getFirstSchedule() async {
+    scheduleMap.clear();
+
+    final items = (await scheduleDb.getAllSchedule());
+    print(items);
+
+    late List<String> dateAndTime;
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+
+    for (int i = 0; i < items.length; i++) {
+      final itemList = await scheduleDb.getSchedule(i + 1);
+      final itemGetMap = itemList[0];
+      print(itemGetMap);
+      // ignore: unnecessary_null_comparison
+      if (itemGetMap != null) {
+        final itemGetTitle = itemGetMap['title'] as String;
+        final itemGetStratAtString = itemGetMap['startAt'] as String;
+        dateAndTime = itemGetStratAtString.split('-');
+        year = int.parse(dateAndTime[0]);
+        month = int.parse(dateAndTime[1]);
+        day = int.parse(dateAndTime[2]);
+        if (dateAndTime[3].length == 4) {
+          hour = int.parse(dateAndTime[3].substring(0, 2));
+          minute = int.parse(dateAndTime[3].substring(2, 4));
+        } else if (dateAndTime[3].length == 3 &&
+            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else if (dateAndTime[3].length == 3) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 2));
+        }
+        List<int> dateTimeList = [year, month, day, hour, minute];
+        print(dateTimeList);
+        final getStartAt = DateTime(dateTimeList[0], dateTimeList[1],
+            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+
+        final itemGetEndAtString = itemGetMap['endAt'] as String;
+        dateAndTime = itemGetEndAtString.split('-');
+        year = int.parse(dateAndTime[0]);
+        month = int.parse(dateAndTime[1]);
+        day = int.parse(dateAndTime[2]);
+        if (dateAndTime[3].length == 4) {
+          hour = int.parse(dateAndTime[3].substring(0, 2));
+          minute = int.parse(dateAndTime[3].substring(2, 4));
+        } else if (dateAndTime[3].length == 3 &&
+            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else if (dateAndTime[3].length == 3) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 2));
+        }
+
+        dateTimeList = [year, month, day, hour, minute];
+        print(dateTimeList);
+        final getEndAt = DateTime(dateTimeList[0], dateTimeList[1],
+            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+
+        final itemGetGetUpTimeString = itemGetMap['getUpTime'] as String;
+        dateAndTime = itemGetGetUpTimeString.split('-');
+        year = int.parse(dateAndTime[0]);
+        month = int.parse(dateAndTime[1]);
+        day = int.parse(dateAndTime[2]);
+        if (dateAndTime[3].length == 4) {
+          hour = int.parse(dateAndTime[3].substring(0, 2));
+          minute = int.parse(dateAndTime[3].substring(2, 4));
+        } else if (dateAndTime[3].length == 3 &&
+            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else if (dateAndTime[3].length == 3) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 3));
+        } else if (dateAndTime[3].length == 2) {
+          hour = int.parse(dateAndTime[3].substring(0, 1));
+          minute = int.parse(dateAndTime[3].substring(1, 2));
+        }
+        dateTimeList = [year, month, day, hour, minute];
+        print(dateTimeList);
+
+        final getGetUpTime = DateTime(dateTimeList[0], dateTimeList[1],
+            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
+        final String itemGetMemo;
+        if (itemGetMap['memo'] != null) {
+          itemGetMemo = itemGetMap['memo'] as String;
+        } else {
+          itemGetMemo = '';
+        }
+
+        final getSceduleItem = Schedule(
+            title: itemGetTitle,
+            startAt: getStartAt,
+            endAt: getEndAt,
+            getUpTime: getGetUpTime,
+            memo: itemGetMemo);
+
+        DateTime checkScheduleTime = DateTime(getSceduleItem.startAt.year,
+            getSceduleItem.startAt.month, getSceduleItem.startAt.day);
+
+        if (scheduleMap.containsKey(checkScheduleTime)) {
+          scheduleMap[checkScheduleTime]!.add(getSceduleItem);
+        } else {
+          scheduleMap[
+              DateTime(getStartAt.year, getStartAt.month, getStartAt.day)] = [
+            getSceduleItem
+          ];
+        }
+        print(scheduleMap);
+      }
+    }
+    setState(() {});
+  }
+
   Future<void> editSchedule(
       {required int index, required Schedule selectedSchedule}) async {
     selectedStartTime = selectedSchedule.startAt;
@@ -889,7 +1002,7 @@ class _CalenderItem extends StatelessWidget {
                                             ),
                                             CupertinoDialogAction(
                                               child: const Text('削除'),
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 Navigator.pop(context);
                                                 deleteSchedule(
                                                     index: e.key,
@@ -926,29 +1039,6 @@ class _CalenderItem extends StatelessWidget {
                                 ),
                               ))
                           .toList()),
-              /*moneyList == null
-                  ? Container()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: moneyList!
-                          .map((e) => Container(
-                                width: double.infinity,
-                                height: 20,
-                                alignment: Alignment.centerLeft,
-                                margin: const EdgeInsets.only(
-                                    left: 2, right: 2, top: 2),
-                                padding:
-                                    const EdgeInsets.only(left: 2, right: 2),
-                                color: Colors.green.withOpacity(0.8),
-                                child: Text(
-                                  e.title,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 10),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                          .toList(),
-                    )*/
             ],
           ),
         ),

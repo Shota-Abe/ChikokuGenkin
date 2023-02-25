@@ -12,6 +12,7 @@ class savingsManagement {
     return rtn;
   }
 
+//支出の場合、引数をマイナスにして入れる
   Future<void> changeSavings(int changes) async {
     setSavings(await getSavings() + changes);
   }
