@@ -47,7 +47,9 @@ class ChartPageState extends State<ChartPage> {
                 // graph
                 padding: const EdgeInsets.only(left: 30, right: 30),
                 child: SfCartesianChart(
-                    title: ChartTitle(text: '貯金額の遷移'), // タイトル
+                    title: ChartTitle(
+                        text: '貯金額の遷移',
+                        textStyle: TextStyle(fontSize: 16.0)), // タイトル
                     legend: Legend(isVisible: true), // 凡例の表示
 
                     primaryXAxis: CategoryAxis(),
@@ -74,8 +76,9 @@ class ChartPageState extends State<ChartPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 0),
-                    child: Text('今月の目標金額： $_alertText円'),
+                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                    child: Text('今月の目標金額： $_alertText円',
+                        style: TextStyle(fontSize: 16.0)),
                   ),
                 ],
               ),
@@ -83,10 +86,10 @@ class ChartPageState extends State<ChartPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    padding: const EdgeInsets.only(right: 20, bottom: 20),
                     child: SizedBox(
-                      height: 50,
-                      width: 100,
+                      height: 40,
+                      width: 150,
                       child: ElevatedButton(
                         onPressed: () {
                           showDialog(
@@ -130,21 +133,24 @@ class ChartPageState extends State<ChartPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 50,
-                    width: 100,
-                    child: ElevatedButton(
-                      onPressed: buttonPressed1,
-                      child: const Text(
-                        '貯金額を\n確認する',
-                        style: TextStyle(
-                            fontSize: 10.0,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w100,
-                            fontFamily: "Roboto"),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, bottom: 20),
+                    child: SizedBox(
+                      height: 40,
+                      width: 150,
+                      child: ElevatedButton(
+                        onPressed: buttonPressed1,
+                        child: const Text(
+                          '貯金額を\n確認する',
+                          style: TextStyle(
+                              fontSize: 10.0,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w100,
+                              fontFamily: "Roboto"),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange),
                       ),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange),
                     ),
                   ),
                 ],
@@ -176,7 +182,7 @@ class ChartPageState extends State<ChartPage> {
         child: Container(
       margin: const EdgeInsets.all(10),
       child: Text(
-        'Item $index',
+        ' 　年　月　　　　　　　　　円',
         style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
     ));
