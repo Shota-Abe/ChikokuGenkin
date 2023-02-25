@@ -49,7 +49,11 @@ class _ScheduleViewState extends State<ScheduleView> {
                         child: Text(DateFormat('起床 H:mm')
                             .format(scheduleListItem[index].getUpTime))),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await scheduleDb.updateSchedule(
+                            idList[index], scheduleListItem[index]);
+                        setState(() {});
+                      },
                       icon: const Icon(Icons.edit),
                       iconSize: 20,
                     ),
@@ -57,7 +61,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                       splashRadius: 10,
                       onPressed: () async {
                         await scheduleDb.deleteSchedule(idList[index]);
-                        setState(() {});
+                        getFirstSchedule();
                       },
                       icon: const Icon(Icons.delete, size: 20),
                     ),

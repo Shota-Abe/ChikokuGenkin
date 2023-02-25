@@ -1,6 +1,7 @@
 import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
 import 'package:calendar_hackathon/model/dbIo.dart';
+import 'package:calendar_hackathon/model/savingsIo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,6 +57,7 @@ class _CalendarViewState extends State<CalendarView> {
   Map<DateTime, List<Money>> moneyMap = {};
 
   final List<int> idList = [];
+  final List scheduleAllList = [];
 
   void selectDate(DateTime cacheDate) {
     selectedDate = cacheDate;
@@ -201,17 +203,26 @@ class _CalendarViewState extends State<CalendarView> {
                     if (!validationIsOk()) {
                       return;
                     }
-
-                    Schedule newSchedule = Schedule(
-                        title: titelContoroller.text,
-                        startAt: selectedStartTime!,
-                        endAt: selectedEndTime!,
-                        getUpTime: getUpTime!,
-                        memo: '');
-
-                    await scheduleDb.createSchedule(newSchedule);
+                    if (idList.firstWhere((element) => element == selectID) ==
+                        selectID) {
+                      await scheduleDb.updateSchedule(
+                          selectID,
+                          Schedule(
+                              title: titelContoroller.text,
+                              startAt: selectedStartTime!,
+                              endAt: selectedEndTime!,
+                              getUpTime: getUpTime!,
+                              memo: ''));
+                    } else {
+                      await scheduleDb.createSchedule(Schedule(
+                          title: titelContoroller.text,
+                          startAt: selectedStartTime!,
+                          endAt: selectedEndTime!,
+                          getUpTime: getUpTime!,
+                          memo: ''));
+                    }
                     getFirstSchedule();
-                    //print(await scheduleDb.getAllSchedule());
+                    print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
                     Navigator.pop(context, true);
@@ -342,10 +353,10 @@ class _CalendarViewState extends State<CalendarView> {
                   splashRadius: 10,
                   onPressed: () async {
                     //歳入歳出を追加する処理
-                    if (!(revenueContoroller.text == null)) {
+                    if (revenueContoroller.text == '') {
                       revenueContoroller.text = '0';
                     }
-                    if (!(expenditureContoroller == null)) {
+                    if (expenditureContoroller.text == '') {
                       expenditureContoroller.text = '0';
                     }
 
@@ -353,11 +364,18 @@ class _CalendarViewState extends State<CalendarView> {
                         selectedDate.month, selectedDate.day);
                     Money newmoneyManager = Money(
                         revenue: int.parse(revenueContoroller.text),
-                        expenditure: int.parse(expenditureContoroller.text),
+                        expenditure: -int.parse(expenditureContoroller.text),
                         date: DateTime(selectedDate.year, selectedDate.month,
                             selectedDate.day));
 
                     await MoneyDb.createMoney(newmoneyManager);
+                    await savingsManagement
+                        .changeSavings(int.parse(revenueContoroller.text));
+                    await savingsManagement
+                        .changeSavings(-int.parse(expenditureContoroller.text));
+
+                    print(await MoneyDb.getAllMoney());
+                    print(await savingsManagement.getSavings());
 
                     //print(await MoneyDb.getAllMoney());
                     Navigator.pop(context, true);
@@ -826,7 +844,7 @@ class _CalendarViewState extends State<CalendarView> {
             ];
           }
           //print(scheduleMap);
-
+          scheduleAllList.add(getSceduleItem);
           idList.add(id);
         }
       }
@@ -836,10 +854,20 @@ class _CalendarViewState extends State<CalendarView> {
 
   Future<void> editSchedule(
       {required int index, required Schedule selectedSchedule}) async {
+    int k = 0;
+    for (int j = 0; j < scheduleAllList.length; j++) {
+      if (selectedSchedule == scheduleAllList[j]) {
+        selectID = idList[k];
+        //print(selectID);
+        break;
+      }
+      k++;
+    }
     selectedStartTime = selectedSchedule.startAt;
     selectedEndTime = selectedSchedule.endAt;
     getUpTime = selectedSchedule.getUpTime;
     titelContoroller.text = selectedSchedule.title;
+
     final result = await showDialog(
         context: context,
         builder: (context) {
@@ -857,6 +885,15 @@ class _CalendarViewState extends State<CalendarView> {
 
   void deleteSchedule(
       {required int index, required Schedule selectedSchedule}) async {
+    int k = 0;
+    for (int j = 0; j < scheduleAllList.length; j++) {
+      if (selectedSchedule == scheduleAllList[j]) {
+        selectID = idList[k];
+        //print(selectID);
+        break;
+      }
+      k++;
+    }
     scheduleMap[DateTime(
       selectedSchedule.startAt.year,
       selectedSchedule.startAt.month,
@@ -1009,7 +1046,6 @@ class _CalenderItem extends StatelessWidget {
                                               },
                                             ),
                                             CupertinoDialogAction(
-                                              child: const Text('削除'),
                                               onPressed: () async {
                                                 Navigator.pop(context);
                                                 deleteSchedule(
@@ -1017,6 +1053,7 @@ class _CalenderItem extends StatelessWidget {
                                                     selectedSchedule: e.value);
                                               },
                                               isDestructiveAction: true,
+                                              child: const Text('削除'),
                                             ),
                                             CupertinoDialogAction(
                                               child: const Text('キャンセル'),
