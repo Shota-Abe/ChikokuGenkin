@@ -9,7 +9,6 @@ class AlarmView extends StatefulWidget {
 }
 
 class _AlarmViewState extends State<AlarmView> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,12 +16,30 @@ class _AlarmViewState extends State<AlarmView> {
         title: const Text('アラーム'),
       ),
       body: Center(
-        child: Column(
-          children: [
-            TextButton(onPressed: () async {
-              await Alarm.stop();
-            }, child: const Text("ボタン"),)
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const TextField(
+                decoration: InputDecoration(hintText: '収入を入力'),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const TextField(
+                decoration: InputDecoration(hintText: '支出を入力'),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await Alarm.stop();
+                },
+                child: const Text("ストップ"),
+              )
+            ],
+          ),
         ),
       ),
     );
