@@ -53,11 +53,8 @@ class _AlarmViewState extends State<AlarmView> {
   }
 
   Future<void> onStopButtonTapped() async {
-    bool hasAlarm = await Alarm.hasAlarm();
-    if (hasAlarm) {
-      await Alarm.stop();
+    await Alarm.stop();
       await save(Money(revenue: revenue, expenditure: expenditure));
-    }
   }
 
   @override
@@ -111,6 +108,11 @@ class _AlarmViewState extends State<AlarmView> {
                   : onStopButtonTapped,
               child: const Text("ストップ"),
             ),
+            // ElevatedButton(
+            //     onPressed: () async {
+            //       await Alarm.stop();
+            //     },
+            //     child: const Text("ストップ")),
             const Spacer(),
             (_isKeyboardVisible)
                 ? Row(
