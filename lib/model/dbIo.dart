@@ -87,7 +87,8 @@ class MoneyDb {
     await moneyDb.execute('''CREATE TABLE money(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         revenue INTEGER,
-        expenditure INTEGER
+        expenditure INTEGER,
+        date TEXT
       )
     ''');
   }
@@ -105,7 +106,11 @@ class MoneyDb {
   static Future<int> createMoney(Money money) async {
     final moneyDb = await MoneyDb.db();
 
-    final data = {'revenue': money.revenue, 'expenditure': money.expenditure};
+    final data = {
+      'revenue': money.revenue,
+      'expenditure': money.expenditure,
+      'date': money.date
+    };
 
     final id = await moneyDb.insert('money', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -126,7 +131,11 @@ class MoneyDb {
   static Future<int> updateMoney(int id, Money money) async {
     final moneyDb = await MoneyDb.db();
 
-    final data = {'revenue': money.revenue, 'expenditure': money.expenditure};
+    final data = {
+      'revenue': money.revenue,
+      'expenditure': money.expenditure,
+      'date': money.date
+    };
 
     final result =
         await moneyDb.update('money', data, where: 'id = ?', whereArgs: [id]);
