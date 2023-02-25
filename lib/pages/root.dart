@@ -11,7 +11,11 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
-  final _screens = [CalendarView(), ChartPage(), AlarmView()];
+  final List<Widget> _screens = [
+    const CalendarView(),
+    ChartPage(),
+    AlarmView()
+  ];
 
   @override
   void initState() {
@@ -37,11 +41,11 @@ class _RootState extends State<Root> {
       body: _screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
+          // if (index == 2) {
+          //   setAlarm(DateTime.now().add(const Duration(seconds: 5)));
+          // }
           setState(() {
             _currentIndex = index;
-            if (index == 2) {
-              setAlarm(DateTime.now().add(const Duration(seconds: 5)));
-            }
           });
         },
         selectedIndex: _currentIndex,
