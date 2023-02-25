@@ -109,7 +109,7 @@ class MoneyDb {
     final data = {
       'revenue': money.revenue,
       'expenditure': money.expenditure,
-      'date': money.date
+      'date': DateFormat('yyyy-MM-dd').format(money.date)
     };
 
     final id = await moneyDb.insert('money', data,
