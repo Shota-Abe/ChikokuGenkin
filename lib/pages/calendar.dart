@@ -69,7 +69,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   Map<DateTime, List<Money>> moneyMap = {
     DateTime(2023, 2, 24): [
-      Money(title: 'お昼ごはん', revenue: 0, expenditure: 2000),
+      Money(revenue: 0, expenditure: 2000),
     ]
   };
 
@@ -367,7 +367,6 @@ class _CalendarViewState extends State<CalendarView> {
                     DateTime checkScheduleTime = DateTime(selectedDate.year,
                         selectedDate.month, selectedDate.day);
                     Money newmoneyManager = Money(
-                        title: titelContoroller.text,
                         revenue: int.parse(revenueContoroller.text),
                         expenditure: int.parse(expenditureContoroller.text));
 
