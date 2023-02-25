@@ -1,5 +1,7 @@
 import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
+import 'package:calendar_hackathon/model/dbIo.dart';
+import 'package:sqflite/sqlite_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,27 +53,9 @@ class _CalendarViewState extends State<CalendarView> {
 
   Map<DateTime, List<Schedule>> scheduleMap = {
     //スケジュール
-    /*DateTime(2023, 2, 24): [
-      Schedule(
-          title: 'ハッカソン',
-          startAt: DateTime(2023, 2, 24, 10),
-          endAt: DateTime(2023, 2, 26, 20),
-          getUpTime: DateTime(2023, 2, 24, 6),
-          memo: ''),
-      Schedule(
-          title: 'プログラミング',
-          startAt: DateTime(2023, 2, 24, 10),
-          endAt: DateTime(2023, 2, 26, 20),
-          getUpTime: DateTime(2023, 2, 24, 6),
-          memo: ''),
-    ]*/
   };
 
-  Map<DateTime, List<Money>> moneyMap = {
-    DateTime(2023, 2, 24): [
-      Money(revenue: 0, expenditure: 2000),
-    ]
-  };
+  Map<DateTime, List<Money>> moneyMap = {};
 
   void selectDate(DateTime cacheDate) {
     selectedDate = cacheDate;
@@ -103,13 +87,13 @@ class _CalendarViewState extends State<CalendarView> {
       appBar: AppBar(
         title: Text(DateFormat('yyyy年 M月')
             .format(DateTime(now.year, now.month + monthDuration))), //年と月の表示
-        elevation: 0, //曜日と上の年月の表示との影をなくす
+        elevation: 1, //曜日と上の年月の表示との影をなくす
       ),
       body: Column(
         children: [
           Container(
             height: 30,
-            color: Theme.of(context).primaryColor, //色
+            color: Theme.of(context).primaryColor,
             //曜日を表示する（日曜日始まり）
             child: Row(
               children: weekName
@@ -148,7 +132,7 @@ class _CalendarViewState extends State<CalendarView> {
                       setState(() {});
                     },
                     icon: const Icon(
-                      Icons.calendar_month,
+                      Icons.event_available,
                       color: Colors.white,
                       size: 30,
                     ),
@@ -169,7 +153,7 @@ class _CalendarViewState extends State<CalendarView> {
                       setState(() {});
                     },
                     icon: const Icon(
-                      Icons.credit_card,
+                      Icons.savings_outlined,
                       color: Colors.white,
                       size: 30,
                     ),
@@ -211,7 +195,7 @@ class _CalendarViewState extends State<CalendarView> {
                 )),
                 IconButton(
                   splashRadius: 10,
-                  onPressed: () {
+                  onPressed: () async {
                     //スケジュールを追加する処理
                     if (!validationIsOk()) {
                       return;
@@ -221,17 +205,14 @@ class _CalendarViewState extends State<CalendarView> {
                         selectedStartTime!.year,
                         selectedStartTime!.month,
                         selectedStartTime!.day);
+
                     Schedule newSchedule = Schedule(
                         title: titelContoroller.text,
                         startAt: selectedStartTime!,
                         endAt: selectedEndTime!,
                         getUpTime: getUpTime!,
                         memo: '');
-                    if (scheduleMap.containsKey(checkScheduleTime)) {
-                      scheduleMap[checkScheduleTime]!.add(newSchedule);
-                    } else {
-                      scheduleMap[checkScheduleTime] = [newSchedule];
-                    }
+                    print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
                     Navigator.pop(context, true);
@@ -355,20 +336,27 @@ class _CalendarViewState extends State<CalendarView> {
                   icon: const Icon(Icons.cancel),
                 ),
                 Expanded(
-                    child: TextField(
-                  controller: titelContoroller,
-                  decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: 'タイトルを入力'),
-                )),
+                    child: Container(
+                        alignment: Alignment.center,
+                        child: Text(DateFormat('MM/dd').format(selectedDate)))),
                 IconButton(
                   splashRadius: 10,
                   onPressed: () {
                     //歳入歳出を追加する処理
+                    if (!(revenueContoroller.text == null)) {
+                      revenueContoroller.text = '0';
+                    }
+                    if (!(expenditureContoroller.text == null)) {
+                      expenditureContoroller.text = '0';
+                    }
+
                     DateTime checkScheduleTime = DateTime(selectedDate.year,
                         selectedDate.month, selectedDate.day);
                     Money newmoneyManager = Money(
                         revenue: int.parse(revenueContoroller.text),
-                        expenditure: int.parse(expenditureContoroller.text));
+                        expenditure: int.parse(expenditureContoroller.text),
+                        date: DateTime(selectedDate.year, selectedDate.month,
+                            selectedDate.day));
 
                     if (moneyMap.containsKey(checkScheduleTime)) {
                       moneyMap[checkScheduleTime]!.add(newmoneyManager);
@@ -385,12 +373,16 @@ class _CalendarViewState extends State<CalendarView> {
               children: [
                 Expanded(
                   child: TextField(
+                    textAlign: TextAlign.right,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
                     ],
                     controller: revenueContoroller,
+                    style: const TextStyle(fontSize: 25),
                     decoration: const InputDecoration(
-                        border: InputBorder.none, hintText: '収入'),
+                        border: InputBorder.none,
+                        hintText: '0',
+                        labelText: '収入'),
                   ),
                 ),
               ],
@@ -399,12 +391,14 @@ class _CalendarViewState extends State<CalendarView> {
               children: [
                 Expanded(
                     child: TextField(
+                  textAlign: TextAlign.right,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
                   ],
                   controller: expenditureContoroller,
+                  style: const TextStyle(fontSize: 25),
                   decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: '支出'),
+                      border: InputBorder.none, hintText: '0', labelText: '支出'),
                 )),
               ],
             )
