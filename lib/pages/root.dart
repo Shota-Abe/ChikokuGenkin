@@ -1,7 +1,9 @@
 import 'package:alarm/alarm.dart';
+import 'package:calendar_hackathon/model/schedule.dart';
 import 'package:calendar_hackathon/pages/alarm.dart';
 import 'package:calendar_hackathon/pages/calendar.dart';
 import 'package:calendar_hackathon/pages/chart_page.dart';
+import 'package:calendar_hackathon/pages/scheduleView.dart';
 import 'package:flutter/material.dart';
 
 class Root extends StatefulWidget {
@@ -11,7 +13,29 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   int _currentIndex = 0;
-  final _screens = [CalendarView(), ChartPage(), AlarmView()];
+  final _screens = [
+    CalendarView(), 
+    ScheduleView(
+      scheduleMap: {
+        //スケジュール
+        DateTime(2023, 2, 24): [
+          Schedule(
+              title: 'ハッカソン',
+              startAt: DateTime(2023, 2, 24, 10),
+              endAt: DateTime(2023, 2, 26, 20),
+              getUpTime: DateTime(2023, 2, 24, 6),
+              memo: ''),
+          Schedule(
+              title: 'プログラミング',
+              startAt: DateTime(2023, 2, 24, 10),
+              endAt: DateTime(2023, 2, 26, 20),
+              getUpTime: DateTime(2023, 2, 24, 6),
+              memo: ''),
+        ]
+      },
+    ),
+    ChartPage(), 
+    AlarmView()];
 
   @override
   void initState() {
@@ -37,11 +61,11 @@ class _RootState extends State<Root> {
       body: _screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
+          if (index == 3) {
+            setAlarm(DateTime.now().add(const Duration(seconds: 5)));
+          }
           setState(() {
             _currentIndex = index;
-            if (index == 2) {
-              setAlarm(DateTime.now().add(const Duration(seconds: 5)));
-            }
           });
         },
         selectedIndex: _currentIndex,
@@ -49,6 +73,10 @@ class _RootState extends State<Root> {
           NavigationDestination(
             icon: Icon(Icons.calendar_month),
             label: 'カレンダー',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.view_list),
+            label: 'スケジュール',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart),

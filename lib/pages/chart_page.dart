@@ -1,30 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-void main() {
-  return runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: _MyHomePage(),
-    );
-  }
-}
-
-class _MyHomePage extends StatefulWidget {
+class ChartPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  _MyHomePage({Key? key}) : super(key: key);
+  ChartPage({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _ChartPageState createState() => _ChartPageState();
 }
 
-class _MyHomePageState extends State<_MyHomePage> {
+class _ChartPageState extends State<ChartPage> {
   late List<_ChartData> data;
   late TooltipBehavior _tooltip;
   String? isSelectedItem = '50000';
