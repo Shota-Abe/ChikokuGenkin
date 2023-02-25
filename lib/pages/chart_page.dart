@@ -91,8 +91,12 @@ class ChartPageState extends State<ChartPage> {
                           showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                    title: Text('Alert'),
+                                    title: Text('目標金額を設定してください'),
                                     content: TextField(
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(10),
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
                                       onChanged: (value) {
                                         setState(() {
                                           _editText = value;
