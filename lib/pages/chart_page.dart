@@ -126,8 +126,8 @@ class ChartPageState extends State<ChartPage> {
                                     ],
                                   ));
                         },
-                        child: Text('目標金額を\n設定する',
-                            style: TextStyle(fontSize: 10.0)),
+                        child:
+                            Text('目標金額を設定する', style: TextStyle(fontSize: 10.0)),
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red),
                       ),
@@ -141,7 +141,7 @@ class ChartPageState extends State<ChartPage> {
                       child: ElevatedButton(
                         onPressed: buttonPressed1,
                         child: const Text(
-                          '貯金額を\n確認する',
+                          '貯金額を確認する',
                           style: TextStyle(
                               fontSize: 10.0,
                               color: Colors.black,
