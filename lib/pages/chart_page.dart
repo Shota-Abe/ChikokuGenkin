@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:flutter/services.dart';
 
 class ChartPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
