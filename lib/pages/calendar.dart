@@ -346,12 +346,12 @@ class _CalendarViewState extends State<CalendarView> {
                         child: Text(DateFormat('MM/dd').format(selectedDate)))),
                 IconButton(
                   splashRadius: 10,
-                  onPressed: () {
+                  onPressed: () async {
                     //歳入歳出を追加する処理
                     if (!(revenueContoroller.text == null)) {
                       revenueContoroller.text = '0';
                     }
-                    if (!(expenditureContoroller.text == null)) {
+                    if (!(expenditureContoroller == null)) {
                       expenditureContoroller.text = '0';
                     }
 
@@ -368,6 +368,8 @@ class _CalendarViewState extends State<CalendarView> {
                     } else {
                       moneyMap[checkScheduleTime] = [newmoneyManager];
                     }
+                    await MoneyDb.createMoney(newmoneyManager);
+                    print(await MoneyDb.getAllMoney());
                     Navigator.pop(context, true);
                   },
                   icon: const Icon(Icons.check_circle),
