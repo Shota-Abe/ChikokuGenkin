@@ -60,9 +60,9 @@ class scheduleDb {
 
     final data = {
       'title': sch.title,
-      'startAt': DateFormat('yyyyMMddHm').format(sch.startAt),
-      'endAt': DateFormat('yyyyMMddHm').format(sch.endAt),
-      'getUpTime': DateFormat('yyyyMMddHm').format(sch.getUpTime),
+      'startAt': DateFormat('yyyy-MM-dd-Hm').format(sch.startAt),
+      'endAt': DateFormat('yyyy-MM-dd-Hm').format(sch.endAt),
+      'getUpTime': DateFormat('yyyy-MM-dd-Hm').format(sch.getUpTime),
       'memo': sch.memo
     };
 
@@ -161,7 +161,7 @@ class MoneyDb {
     final data = {
       'revenue': money.revenue,
       'expenditure': money.expenditure,
-      'date': DateFormat('yyyyMMdd').format(money.date)
+      'date': DateFormat('yyyy-MM-dd').format(money.date)
     };
 
     final id = await moneyDb.insert('money', data,
@@ -178,6 +178,43 @@ class MoneyDb {
   static Future<List<Map<String, dynamic>>> getMoney(int id) async {
     final moneyDb = await MoneyDb.db();
     return moneyDb.query('money', where: 'id = ?', whereArgs: [id], limit: 1);
+  }
+
+  Future<int> getSumMonthMoney(String year, String month) async {
+    int sum = 0;
+    final moneyDb = await MoneyDb.db();
+    final result = await moneyDb.rawQuery(
+      '''
+        SELECT * FROM money 
+        WHERE date LIKE ?
+      ''',
+      ['$year-$month-%'],
+    );
+    //print(result.length);
+    for (int i = 0; i < result.length; i++) {
+      sum += result[i]['revenue'] as int;
+      //print(result[i]['revenue'] as int);
+      sum -= result[i]['expenditure'] as int;
+      //print(result[i]['expenditure'] as int);
+    }
+    return sum;
+  }
+
+  Future<int> getSumDayMoney(DateTime ymd) async {
+    int sum = 0;
+    final moneyDb = await MoneyDb.db();
+    final result = await moneyDb.rawQuery(
+      '''
+        SELECT * FROM money 
+        WHERE date LIKE ?
+      ''',
+      ['${DateFormat('yyyy-MM-dd').format(ymd)}'],
+    );
+    for (int i = 0; i < result.length; i++) {
+      sum += result[i]['revenue'] as int;
+      sum -= result[i]['expenditure'] as int;
+    }
+    return sum;
   }
 
   static Future<int> updateMoney(int id, Money money) async {
