@@ -14,32 +14,11 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
+  Map<DateTime, List<Schedule>> scheduleMap = {};
+
   int _currentIndex = 0;
   bool _shouldShowBlack = false;
-  final _screens = [
-    CalendarView(),
-    ScheduleView(
-      scheduleMap: {
-        //スケジュール
-        DateTime(2023, 2, 24): [
-          Schedule(
-              title: 'ハッカソン',
-              startAt: DateTime(2023, 2, 24, 10),
-              endAt: DateTime(2023, 2, 26, 20),
-              getUpTime: DateTime(2023, 2, 24, 6),
-              memo: ''),
-          Schedule(
-              title: 'プログラミング',
-              startAt: DateTime(2023, 2, 24, 10),
-              endAt: DateTime(2023, 2, 26, 20),
-              getUpTime: DateTime(2023, 2, 24, 6),
-              memo: ''),
-        ]
-      },
-    ),
-    ChartPage(),
-    AlarmView()
-  ];
+  final _screens = [CalendarView(), ScheduleView(), ChartPage(), AlarmView()];
 
   @override
   void initState() {
@@ -47,14 +26,14 @@ class _RootState extends State<Root> {
   }
 
   Future<void> setAlarm([bool enableNotif = true]) async {
-    final id = await scheduleDb.createSchedule(Schedule(
-        title: "title",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        getUpTime: DateTime.now().add(Duration(minutes: 1)),
-        // getUpTime: DateTime.now(),
-        memo: "memo"));
-    print(await scheduleDb.getSchedule(id));
+    // final id = await scheduleDb.createSchedule(Schedule(
+    //     title: "title",
+    //     startAt: DateTime.now(),
+    //     endAt: DateTime.now(),
+    //     getUpTime: DateTime.now().add(Duration(minutes: 1)),
+    //     // getUpTime: DateTime.now(),
+    //     memo: "memo"));
+    // print(await scheduleDb.getSchedule(id));
 
     final nextSchedule = await scheduleDb.getNextSchedule();
 
@@ -66,8 +45,26 @@ class _RootState extends State<Root> {
       int year = int.parse(dateAndTime[0]);
       int month = int.parse(dateAndTime[1]);
       int day = int.parse(dateAndTime[2]);
-      int hour = int.parse(dateAndTime[3].substring(0, 2));
-      int minute = int.parse(dateAndTime[3].substring(2, 4));
+      int hour;
+      int minute;
+      if (dateAndTime[3].length == 4) {
+        hour = int.parse(dateAndTime[3].substring(0, 2));
+        minute = int.parse(dateAndTime[3].substring(2, 4));
+      } else if (dateAndTime[3].length == 3 &&
+          int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+        hour = int.parse(dateAndTime[3].substring(0, 1));
+        minute = int.parse(dateAndTime[3].substring(1, 3));
+      } else if (dateAndTime[3].length == 3) {
+        hour = int.parse(dateAndTime[3].substring(0, 2));
+        minute = int.parse(dateAndTime[3].substring(2, 3));
+      } else if (dateAndTime[3].length == 2 &&
+          int.parse(dateAndTime[3]) != 10) {
+        hour = int.parse(dateAndTime[3].substring(0, 1));
+        minute = int.parse(dateAndTime[3].substring(1, 2));
+      } else {
+        hour = int.parse(dateAndTime[3]);
+        minute = 0;
+      }
       List<int> dateTimeList = [year, month, day, hour, minute];
       print(dateTimeList); // [2023, 2, 25, 16, 47]
 
@@ -78,8 +75,8 @@ class _RootState extends State<Root> {
         dateTime: nextGetUpTime,
         assetAudioPath: 'assets/alarm.mp3',
         loopAudio: true,
-        notificationTitle: enableNotif ? 'Alarm example' : null,
-        notificationBody: enableNotif ? 'Your alarm is ringing' : null,
+        notificationTitle: enableNotif ? 'アラーム' : null,
+        notificationBody: enableNotif ? 'アラームが鳴っています' : null,
         enableNotificationOnKill: true,
       );
 
