@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class savingsManagement {
   static Future setSavings(int savings) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('targetSpend', savings);
+    prefs.setInt('Savings', savings);
   }
 
   static Future<int> getSavings() async {
