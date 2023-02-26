@@ -258,14 +258,18 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
           }),
     ));
   }
-
+  
   void buttonPressed1() async {
     int expenditure = await moneyDb.getSumMonthExpenditure(
         DateFormat('yyyy').format(now), DateFormat('MM').format(now));
+    int targetMoney = await int.parse(_alertText) - expenditure;
     showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          AlertDialog(title: Text('あなたの使用金額は\n$expenditure円です')),
+      builder: (BuildContext context) => AlertDialog(
+          title: Text(
+        'あなたの使用金額は$expenditure円です\n残り${targetMoney}円です',
+        style: TextStyle(fontSize: 15),
+      )),
     );
   }
 }

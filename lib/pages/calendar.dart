@@ -391,17 +391,18 @@ class _CalendarViewState extends State<CalendarView> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    textAlign: TextAlign.right,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    controller: revenueContoroller,
-                    style: const TextStyle(fontSize: 25),
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '0',
-                        labelText: '収入'),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: TextField(
+                      textAlign: TextAlign.right,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      controller: revenueContoroller,
+                      style: const TextStyle(fontSize: 25),
+                      decoration:
+                          const InputDecoration(hintText: '0', labelText: '収入'),
+                    ),
                   ),
                 ),
               ],
@@ -409,15 +410,19 @@ class _CalendarViewState extends State<CalendarView> {
             Row(
               children: [
                 Expanded(
-                    child: TextField(
-                  textAlign: TextAlign.right,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  controller: expenditureContoroller,
-                  style: const TextStyle(fontSize: 25),
-                  decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: '0', labelText: '支出'),
+                    child: Padding(
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 5),
+                  child: TextField(
+                    textAlign: TextAlign.right,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    controller: expenditureContoroller,
+                    style: const TextStyle(fontSize: 25),
+                    decoration:
+                        const InputDecoration(hintText: '0', labelText: '支出'),
+                  ),
                 )),
               ],
             )
