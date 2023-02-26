@@ -90,7 +90,7 @@ class _CalendarViewState extends State<CalendarView> {
       appBar: AppBar(
         title: Text(DateFormat('yyyy年 M月')
             .format(DateTime(now.year, now.month + monthDuration))), //年と月の表示
-        elevation: 1, //曜日と上の年月の表示との影をなくす
+        elevation: 0, //曜日と上の年月の表示との影をなくす
       ),
       body: Column(
         children: [

@@ -25,47 +25,43 @@ class _ScheduleViewState extends State<ScheduleView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("予定表"),
-        elevation: 1,
       ),
       body: ListView.builder(
         itemCount: scheduleListItem.length,
         itemBuilder: (context, index) {
           return Column(
             children: [
-              ListTile(
-                title: Text(
-                  '${scheduleListItem[index].startAt.month}/${scheduleListItem[index].startAt.day} ${scheduleListItem[index].title}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                subtitle: Row(
-                  children: [
-                    Expanded(
-                        child: Text(DateFormat('開始 H:mm')
-                            .format(scheduleListItem[index].startAt))),
-                    Expanded(
-                        child: Text(DateFormat('終了 H:mm')
-                            .format(scheduleListItem[index].endAt))),
-                    Expanded(
-                        child: Text(DateFormat('起床 H:mm')
-                            .format(scheduleListItem[index].getUpTime))),
-                    IconButton(
-                      onPressed: () async {
-                        await scheduleDb.updateSchedule(
-                            idList[index], scheduleListItem[index]);
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.edit),
-                      iconSize: 20,
-                    ),
-                    IconButton(
-                      splashRadius: 10,
-                      onPressed: () async {
-                        await scheduleDb.deleteSchedule(idList[index]);
-                        getFirstSchedule();
-                      },
-                      icon: const Icon(Icons.delete, size: 20),
-                    ),
-                  ],
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: ListTile(
+                  title: Text(
+                    '${scheduleListItem[index].startAt.month}/${scheduleListItem[index].startAt.day} ${scheduleListItem[index].title}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  subtitle: Row(
+                    children: [
+                      Expanded(
+                          child: Text(DateFormat('開始 H:mm')
+                              .format(scheduleListItem[index].startAt))),
+                      Expanded(
+                          child: Text(DateFormat('終了 H:mm')
+                              .format(scheduleListItem[index].endAt))),
+                      Expanded(
+                          child: Text(DateFormat('起床 H:mm')
+                              .format(scheduleListItem[index].getUpTime))),
+                      TextButton.icon(
+                        onPressed: () async {
+                          await scheduleDb.deleteSchedule(idList[index]);
+                          getFirstSchedule();
+                          setState(() {});
+                        },
+                        label: const Text('削除'),
+                        icon: const Icon(Icons.delete, size: 20),
+                        style:
+                            TextButton.styleFrom(alignment: Alignment.topLeft),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const Divider(height: 0),
@@ -109,6 +105,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   }
 
   Future<void> getFirstSchedule() async {
+    scheduleListItem.clear();
     final items = (await scheduleDb.getAllSchedule());
     //print(items);
 
