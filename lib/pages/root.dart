@@ -47,14 +47,14 @@ class _RootState extends State<Root> {
   }
 
   Future<void> setAlarm([bool enableNotif = true]) async {
-    final id = await scheduleDb.createSchedule(Schedule(
-        title: "title",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        getUpTime: DateTime.now().add(Duration(minutes: 1)),
-        // getUpTime: DateTime.now(),
-        memo: "memo"));
-    print(await scheduleDb.getSchedule(id));
+    // final id = await scheduleDb.createSchedule(Schedule(
+    //     title: "title",
+    //     startAt: DateTime.now(),
+    //     endAt: DateTime.now(),
+    //     getUpTime: DateTime.now().add(Duration(minutes: 1)),
+    //     // getUpTime: DateTime.now(),
+    //     memo: "memo"));
+    // print(await scheduleDb.getSchedule(id));
 
     final nextSchedule = await scheduleDb.getNextSchedule();
 
@@ -78,8 +78,8 @@ class _RootState extends State<Root> {
         dateTime: nextGetUpTime,
         assetAudioPath: 'assets/alarm.mp3',
         loopAudio: true,
-        notificationTitle: enableNotif ? 'Alarm example' : null,
-        notificationBody: enableNotif ? 'Your alarm is ringing' : null,
+        notificationTitle: enableNotif ? 'アラーム' : null,
+        notificationBody: enableNotif ? 'アラームが鳴っています' : null,
         enableNotificationOnKill: true,
       );
 
