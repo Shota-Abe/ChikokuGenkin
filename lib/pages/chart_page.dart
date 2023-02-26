@@ -37,18 +37,23 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     Future(() async {
       String targetSpend = '${await tSIo.getTargetSpend()}';
       int savingTmp = await savingsManagement.getSavings();
+      _savingMoney = savingTmp;
+
       int tmp = _savingMoney;
+      print(tmp);
       for (int i = 0; i < 7; i++) {
         data.insert(
             0,
             _ChartData(
-                '${DateFormat('M/d').format(now.add(Duration(days: -i)))}',
+                '${DateFormat('M/d').format(DateTime(now.year, now.month, now.day - i) /*now.add(Duration(days: -i))*/)}',
                 (tmp).toDouble()));
-        tmp -= await moneyDb.getSumDayMoney(now.add(Duration(days: -i)));
+        tmp -= await moneyDb
+            .getSumDayMoney(DateTime(now.year, now.month, now.day - i));
+        print(
+            '${await moneyDb.getSumDayMoney(DateTime(now.year, now.month, now.day - i))} ; $tmp');
       }
       setState(() {
         _alertText = targetSpend;
-        _savingMoney = savingTmp;
       });
     });
     //initStateはウィジェット作成時の初期値
