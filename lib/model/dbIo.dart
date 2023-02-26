@@ -80,6 +80,58 @@ class scheduleDb {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
+
+  // static Future<DateTime?> getNextGetUpTime() async {
+  //   final schDb = await scheduleDb.db();
+  //   final now = DateTime.now();
+  //   final result = await schDb.rawQuery(
+  //     '''
+  //     SELECT getUpTime FROM schedule
+  //     WHERE getUpTime > ?
+  //     ORDER BY getUpTime ASC
+  //     LIMIT 1
+  //   ''',
+  //     // [DateFormat('yyyy-MM-dd-Hm').format(now)],
+  //    [now.toIso8601String()], // ISO 8601形式で渡す
+  //   );
+  //   if (result.isEmpty) return null;
+  //   final getUpTimeStr = result[0]['getUpTime'] as String;
+  //   return DateFormat('yyyy-MM-dd-Hm').parse(getUpTimeStr);
+  // }
+
+//   static Future<DateTime?> getNextGetUpTime() async {
+//   final schDb = await scheduleDb.db();
+//   final now = DateTime.now();
+//   final today = DateTime(now.year, now.month, now.day, now.minute); // 今日の日付を取得する
+//   final result = await schDb.rawQuery(
+//     '''
+//       SELECT getUpTime FROM schedule
+//       WHERE getUpTime > ?
+//       ORDER BY getUpTime ASC
+//       LIMIT 1
+//     ''',
+//     [today.toIso8601String()], // ISO 8601形式で渡す
+//   );
+//   if (result.isEmpty) return null;
+//   final getUpTimeStr = result[0]['getUpTime'] as String;
+//   return DateFormat('yyyy-MM-dd-Hm').parse(getUpTimeStr);
+// }
+
+  static Future<Map<String, dynamic>?> getNextSchedule() async {
+    final schDb = await scheduleDb.db();
+    final now = DateTime.now();
+    final result = await schDb.rawQuery(
+      '''
+        SELECT * FROM schedule 
+        WHERE getUpTime > ? 
+        ORDER BY getUpTime ASC 
+        LIMIT 1
+      ''',
+      [DateFormat('yyyy-MM-dd-Hm').format(now)],
+    );
+    if (result.isEmpty) return null;
+    return result[0];
+  }
 }
 
 class MoneyDb {
