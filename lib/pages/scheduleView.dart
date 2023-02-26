@@ -24,7 +24,7 @@ class _ScheduleViewState extends State<ScheduleView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("予定表"),
+        title: const Text("スケジュール"),
       ),
       body: ListView.builder(
         itemCount: scheduleListItem.length,
