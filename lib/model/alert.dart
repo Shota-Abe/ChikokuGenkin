@@ -2,7 +2,13 @@ import 'package:calendar_hackathon/model/savingsIo.dart';
 import 'package:calendar_hackathon/model/targetSpendIo.dart';
 
 class Alert {
-  final List<String> Emoticon = ['😆', '😀', '🙂', '😥', '😱'];
+  final List<String> Emoticon = [
+    ':laughing:',
+    ':grinning:',
+    ':slight_smile:',
+    ':disappointed_relieved:',
+    ':scream:'
+  ];
 
   Future<int> rtnState(int spend) async {
     targetSpendIo tSIo = targetSpendIo();
