@@ -733,15 +733,18 @@ class _CalendarViewState extends State<CalendarView> {
       hour = int.parse(dateAndTime[3].substring(0, 2));
       minute = int.parse(dateAndTime[3].substring(2, 4));
     } else if (dateAndTime[3].length == 3 &&
-        int.parse(dateAndTime[3].substring(0, 2)) < 24) {
+        int.parse(dateAndTime[3].substring(0, 2)) > 24) {
       hour = int.parse(dateAndTime[3].substring(0, 1));
       minute = int.parse(dateAndTime[3].substring(1, 3));
     } else if (dateAndTime[3].length == 3) {
       hour = int.parse(dateAndTime[3].substring(0, 2));
       minute = int.parse(dateAndTime[3].substring(2, 3));
-    } else {
+    } else if (dateAndTime[3].length == 2 && int.parse(dateAndTime[3]) != 10) {
       hour = int.parse(dateAndTime[3].substring(0, 1));
       minute = int.parse(dateAndTime[3].substring(1, 2));
+    } else {
+      hour = int.parse(dateAndTime[3]);
+      minute = 0;
     }
     List<int> dateTimeList = [year, month, day, hour, minute];
     //print(dateTimeList);

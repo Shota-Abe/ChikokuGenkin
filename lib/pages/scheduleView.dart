@@ -76,16 +76,42 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 
+  DateTime getItems(String getItemString) {
+    int hour;
+    int minute;
+    List<String> dateAndTime = getItemString.split('-');
+    int year = int.parse(dateAndTime[0]);
+    int month = int.parse(dateAndTime[1]);
+    int day = int.parse(dateAndTime[2]);
+    if (dateAndTime[3].length == 4) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 4));
+    } else if (dateAndTime[3].length == 3 &&
+        int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 3));
+    } else if (dateAndTime[3].length == 3) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 3));
+    } else if (dateAndTime[3].length == 2 && int.parse(dateAndTime[3]) != 10) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 2));
+    } else {
+      hour = int.parse(dateAndTime[3]);
+      minute = 0;
+    }
+    List<int> dateTimeList = [year, month, day, hour, minute];
+    //print(dateTimeList);
+    final getItem = DateTime(dateTimeList[0], dateTimeList[1], dateTimeList[2],
+        dateTimeList[3], dateTimeList[4]);
+
+    return getItem;
+  }
+
   Future<void> getFirstSchedule() async {
     final items = (await scheduleDb.getAllSchedule());
     //print(items);
 
-    late List<String> dateAndTime;
-    int year;
-    int month;
-    int day;
-    int hour;
-    int minute;
     int id;
 
     for (int i = 0; i < items.length; i++) {
@@ -96,85 +122,10 @@ class _ScheduleViewState extends State<ScheduleView> {
       // ignore: unnecessary_null_comparison
       if (itemGetMap != null) {
         final itemGetTitle = itemGetMap['title'] as String;
-        final itemGetStratAtString = itemGetMap['startAt'] as String;
-        dateAndTime = itemGetStratAtString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
-        }
-        List<int> dateTimeList = [year, month, day, hour, minute];
-        //print(dateTimeList);
-        final getStartAt = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-
-        final itemGetEndAtString = itemGetMap['endAt'] as String;
-        dateAndTime = itemGetEndAtString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
-        }
-
-        dateTimeList = [year, month, day, hour, minute];
-        //print(dateTimeList);
-        final getEndAt = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-
-        final itemGetGetUpTimeString = itemGetMap['getUpTime'] as String;
-        dateAndTime = itemGetGetUpTimeString.split('-');
-        year = int.parse(dateAndTime[0]);
-        month = int.parse(dateAndTime[1]);
-        day = int.parse(dateAndTime[2]);
-        if (dateAndTime[3].length == 4) {
-          hour = int.parse(dateAndTime[3].substring(0, 2));
-          minute = int.parse(dateAndTime[3].substring(2, 4));
-        } else if (dateAndTime[3].length == 3 &&
-            int.parse(dateAndTime[3].substring(0, 2)) > 24) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 3) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 3));
-        } else if (dateAndTime[3].length == 2) {
-          hour = int.parse(dateAndTime[3].substring(0, 1));
-          minute = int.parse(dateAndTime[3].substring(1, 2));
-        }
-        dateTimeList = [year, month, day, hour, minute];
-        //print(dateTimeList);
-
-        final getGetUpTime = DateTime(dateTimeList[0], dateTimeList[1],
-            dateTimeList[2], dateTimeList[3], dateTimeList[4]);
-        final String itemGetMemo;
-        if (itemGetMap['memo'] != null) {
-          itemGetMemo = itemGetMap['memo'] as String;
-        } else {
-          itemGetMemo = '';
-        }
+        final getStartAt = getItems(itemGetMap['startAt'] as String);
+        final getEndAt = getItems(itemGetMap['endAt'] as String);
+        final getGetUpTime = getItems(itemGetMap['getUpTime'] as String);
+        final String itemGetMemo = itemGetMap['memo'] as String;
 
         final getSceduleItem = Schedule(
             title: itemGetTitle,
