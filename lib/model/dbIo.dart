@@ -60,9 +60,9 @@ class scheduleDb {
 
     final data = {
       'title': sch.title,
-      'startAt': DateFormat('yyyyMMddHm').format(sch.startAt),
-      'endAt': DateFormat('yyyyMMddHm').format(sch.endAt),
-      'getUpTime': DateFormat('yyyyMMddHm').format(sch.getUpTime),
+      'startAt': DateFormat('yyyy-MM-dd-Hm').format(sch.startAt),
+      'endAt': DateFormat('yyyy-MM-dd-Hm').format(sch.endAt),
+      'getUpTime': DateFormat('yyyy-MM-dd-Hm').format(sch.getUpTime),
       'memo': sch.memo
     };
 

@@ -14,32 +14,11 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
+  Map<DateTime, List<Schedule>> scheduleMap = {};
+
   int _currentIndex = 0;
   bool _shouldShowBlack = false;
-  final _screens = [
-    CalendarView(),
-    ScheduleView(
-      scheduleMap: {
-        //スケジュール
-        DateTime(2023, 2, 24): [
-          Schedule(
-              title: 'ハッカソン',
-              startAt: DateTime(2023, 2, 24, 10),
-              endAt: DateTime(2023, 2, 26, 20),
-              getUpTime: DateTime(2023, 2, 24, 6),
-              memo: ''),
-          Schedule(
-              title: 'プログラミング',
-              startAt: DateTime(2023, 2, 24, 10),
-              endAt: DateTime(2023, 2, 26, 20),
-              getUpTime: DateTime(2023, 2, 24, 6),
-              memo: ''),
-        ]
-      },
-    ),
-    ChartPage(),
-    AlarmView()
-  ];
+  final _screens = [CalendarView(), ScheduleView(), ChartPage(), AlarmView()];
 
   @override
   void initState() {

@@ -1,33 +1,24 @@
 import 'package:calendar_hackathon/model/schedule.dart';
+import 'package:calendar_hackathon/model/dbIo.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ScheduleView extends StatefulWidget {
-  const ScheduleView({Key? key, required this.scheduleMap}) : super(key: key);
-  final Map<DateTime, List<Schedule>> scheduleMap;
+  const ScheduleView({Key? key}) : super(key: key);
 
   @override
   State<ScheduleView> createState() => _ScheduleViewState();
 }
 
 class _ScheduleViewState extends State<ScheduleView> {
-  late DateTime selectedList;
+  final List<Schedule> scheduleListItem = []; //スケジュール
+  final List<int> idList = [];
 
-  final List<Schedule> scheduleListItem = [
-    //スケジュール
-    Schedule(
-        title: 'ハッカソン',
-        startAt: DateTime(2023, 2, 24, 10),
-        endAt: DateTime(2023, 2, 26, 20),
-        getUpTime: DateTime(2023, 2, 24, 6),
-        memo: ''),
-    Schedule(
-        title: 'プログラミング',
-        startAt: DateTime(2023, 2, 24, 10),
-        endAt: DateTime(2023, 2, 26, 20),
-        getUpTime: DateTime(2023, 2, 24, 6),
-        memo: '')
-  ]; //schefuleMapをそのまま持ってきたい。
+  @override
+  void initState() {
+    super.initState();
+    getFirstSchedule();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +49,20 @@ class _ScheduleViewState extends State<ScheduleView> {
                         child: Text(DateFormat('起床 H:mm')
                             .format(scheduleListItem[index].getUpTime))),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await scheduleDb.updateSchedule(
+                            idList[index], scheduleListItem[index]);
+                        setState(() {});
+                      },
                       icon: const Icon(Icons.edit),
                       iconSize: 20,
                     ),
                     IconButton(
                       splashRadius: 10,
-                      onPressed: () {},
+                      onPressed: () async {
+                        await scheduleDb.deleteSchedule(idList[index]);
+                        getFirstSchedule();
+                      },
                       icon: const Icon(Icons.delete, size: 20),
                     ),
                   ],
@@ -78,106 +76,68 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 
-  /* Widget createScheduleItem() {
-    return ListView.builder(
-      itemCount: scheduleListItem.length,
-      itemBuilder: (context, index) {
-        List<Widget> scheduleList = [];
-        for (int i = 0; i < 2; i++) {
-          scheduleList.add(_scheduleItem(selectedList: selectedList));
-        }
-        return Container(
-          child: ListTile(
-            title: Text(scheduleListItem[index]['title']),
-            subtitle: Text('開始時間 ${scheduleListItem[index]['startAt']}'),
-          ),
-        );
-      },
-    );
-  }*/
-}
+  DateTime getItems(String getItemString) {
+    int hour;
+    int minute;
+    List<String> dateAndTime = getItemString.split('-');
+    int year = int.parse(dateAndTime[0]);
+    int month = int.parse(dateAndTime[1]);
+    int day = int.parse(dateAndTime[2]);
+    if (dateAndTime[3].length == 4) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 4));
+    } else if (dateAndTime[3].length == 3 &&
+        int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 3));
+    } else if (dateAndTime[3].length == 3) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 3));
+    } else if (dateAndTime[3].length == 2 && int.parse(dateAndTime[3]) != 10) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 2));
+    } else {
+      hour = int.parse(dateAndTime[3]);
+      minute = 0;
+    }
+    List<int> dateTimeList = [year, month, day, hour, minute];
+    //print(dateTimeList);
+    final getItem = DateTime(dateTimeList[0], dateTimeList[1], dateTimeList[2],
+        dateTimeList[3], dateTimeList[4]);
 
-
-/*class _scheduleItem extends StatelessWidget {
-  final DateTime selectedList;
-  const _scheduleItem({required this.selectedList});
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        child: GestureDetector(
-      onTap: () {},
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.green, border: Border.all(color: Colors.grey)),
-        child: Column(children: [
-          scheduleList == null
-              ? Container()
-              : Column(
-                  //スケジュールのカレンダー上の表示
-                  children: scheduleList
-                      .asMap()
-                      .entries
-                      .map((e) => GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title: Text(e.value.title),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                          child: const Text('編集'),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            editSchedule(
-                                                index: e.key,
-                                                selectedSchedule: e.value);
-                                          },
-                                        ),
-                                        CupertinoDialogAction(
-                                          child: const Text('削除'),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            scheduleList[DateTime(
-                                              selectedSchedule.startAt.year,
-                                              selectedSchedule.startAt.month,
-                                              selectedSchedule.startAt.day,
-                                            )]!
-                                                .removeAt(index);
-                                            setState(() {});
-                                          },
-                                          isDestructiveAction: true,
-                                        ),
-                                        CupertinoDialogAction(
-                                          child: const Text('キャンセル'),
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              height: 20,
-                              alignment: Alignment.centerLeft,
-                              margin: const EdgeInsets.only(
-                                  left: 2, right: 2, top: 2),
-                              padding: const EdgeInsets.only(left: 2, right: 2),
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.8),
-                              child: Text(
-                                e.value.title,
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 10),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ))
-                      .toList()),
-        ]),
-      ),
-    ));
+    return getItem;
   }
-}*/
+
+  Future<void> getFirstSchedule() async {
+    final items = (await scheduleDb.getAllSchedule());
+    //print(items);
+
+    int id;
+
+    for (int i = 0; i < items.length; i++) {
+      id = items[i]['id'];
+      final itemList = await scheduleDb.getSchedule(id);
+      final itemGetMap = itemList[0];
+      //print(itemGetMap);
+      // ignore: unnecessary_null_comparison
+      if (itemGetMap != null) {
+        final itemGetTitle = itemGetMap['title'] as String;
+        final getStartAt = getItems(itemGetMap['startAt'] as String);
+        final getEndAt = getItems(itemGetMap['endAt'] as String);
+        final getGetUpTime = getItems(itemGetMap['getUpTime'] as String);
+        final String itemGetMemo = itemGetMap['memo'] as String;
+
+        final getSceduleItem = Schedule(
+            title: itemGetTitle,
+            startAt: getStartAt,
+            endAt: getEndAt,
+            getUpTime: getGetUpTime,
+            memo: itemGetMemo);
+
+        scheduleListItem.add(getSceduleItem);
+        idList.add(id);
+      }
+      setState(() {});
+    }
+  }
+}

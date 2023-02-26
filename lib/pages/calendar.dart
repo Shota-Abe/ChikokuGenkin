@@ -1,7 +1,7 @@
 import 'package:calendar_hackathon/model/moneyManagemant.dart';
 import 'package:calendar_hackathon/model/schedule.dart';
 import 'package:calendar_hackathon/model/dbIo.dart';
-import 'package:sqflite/sqlite_api.dart';
+import 'package:calendar_hackathon/model/savingsIo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +25,7 @@ class _CalendarViewState extends State<CalendarView> {
   late DateTime selectedDate; //選択した日付
   late int initialIndex; //ページ遷移数
   int monthDuration = 0;
+  late int selectID;
 
   DateTime? selectedStartTime;
   DateTime? selectedEndTime;
@@ -51,15 +52,12 @@ class _CalendarViewState extends State<CalendarView> {
 
   bool isSettingStartTime = true;
 
-  Map<DateTime, List<Schedule>> scheduleMap = {
-    //スケジュール
-  };
+  Map<DateTime, List<Schedule>> scheduleMap = {};
 
-  Map<DateTime, List<Money>> moneyMap = {
-    DateTime(2023, 2, 24): [
-      Money(revenue: 0, expenditure: 2000, date: DateTime(2023, 2, 26)),
-    ]
-  };
+  Map<DateTime, List<Money>> moneyMap = {};
+
+  final List<int> idList = [];
+  final List scheduleAllList = [];
 
   void selectDate(DateTime cacheDate) {
     selectedDate = cacheDate;
@@ -70,6 +68,7 @@ class _CalendarViewState extends State<CalendarView> {
   //ページの始まり
   void initState() {
     super.initState();
+    getFirstSchedule();
 
     yearOption = [now.year];
     for (int i = 1; i < 10; i++) {
@@ -204,19 +203,25 @@ class _CalendarViewState extends State<CalendarView> {
                     if (!validationIsOk()) {
                       return;
                     }
-
-                    DateTime checkScheduleTime = DateTime(
-                        selectedStartTime!.year,
-                        selectedStartTime!.month,
-                        selectedStartTime!.day);
-
-                    Schedule newSchedule = Schedule(
-                        title: titelContoroller.text,
-                        startAt: selectedStartTime!,
-                        endAt: selectedEndTime!,
-                        getUpTime: getUpTime!,
-                        memo: '');
-                    await scheduleDb.createSchedule(newSchedule);
+                    if (idList.firstWhere((element) => element == selectID) ==
+                        selectID) {
+                      await scheduleDb.updateSchedule(
+                          selectID,
+                          Schedule(
+                              title: titelContoroller.text,
+                              startAt: selectedStartTime!,
+                              endAt: selectedEndTime!,
+                              getUpTime: getUpTime!,
+                              memo: ''));
+                    } else {
+                      await scheduleDb.createSchedule(Schedule(
+                          title: titelContoroller.text,
+                          startAt: selectedStartTime!,
+                          endAt: selectedEndTime!,
+                          getUpTime: getUpTime!,
+                          memo: ''));
+                    }
+                    getFirstSchedule();
                     print(await scheduleDb.getAllSchedule());
                     selectedEndTime = null;
                     getUpTime = null;
@@ -348,10 +353,10 @@ class _CalendarViewState extends State<CalendarView> {
                   splashRadius: 10,
                   onPressed: () async {
                     //歳入歳出を追加する処理
-                    if (!(revenueContoroller.text == null)) {
+                    if (revenueContoroller.text == '') {
                       revenueContoroller.text = '0';
                     }
-                    if (!(expenditureContoroller == null)) {
+                    if (expenditureContoroller.text == '') {
                       expenditureContoroller.text = '0';
                     }
 
@@ -359,17 +364,20 @@ class _CalendarViewState extends State<CalendarView> {
                         selectedDate.month, selectedDate.day);
                     Money newmoneyManager = Money(
                         revenue: int.parse(revenueContoroller.text),
-                        expenditure: int.parse(expenditureContoroller.text),
+                        expenditure: -int.parse(expenditureContoroller.text),
                         date: DateTime(selectedDate.year, selectedDate.month,
                             selectedDate.day));
 
-                    if (moneyMap.containsKey(checkScheduleTime)) {
-                      moneyMap[checkScheduleTime]!.add(newmoneyManager);
-                    } else {
-                      moneyMap[checkScheduleTime] = [newmoneyManager];
-                    }
                     await MoneyDb.createMoney(newmoneyManager);
+                    await savingsManagement
+                        .changeSavings(int.parse(revenueContoroller.text));
+                    await savingsManagement
+                        .changeSavings(-int.parse(expenditureContoroller.text));
+
                     print(await MoneyDb.getAllMoney());
+                    print(await savingsManagement.getSavings());
+
+                    //print(await MoneyDb.getAllMoney());
                     Navigator.pop(context, true);
                   },
                   icon: const Icon(Icons.check_circle),
@@ -714,35 +722,129 @@ class _CalendarViewState extends State<CalendarView> {
     }
   }
 
+  DateTime getItems(String getItemString) {
+    int hour;
+    int minute;
+    List<String> dateAndTime = getItemString.split('-');
+    int year = int.parse(dateAndTime[0]);
+    int month = int.parse(dateAndTime[1]);
+    int day = int.parse(dateAndTime[2]);
+    if (dateAndTime[3].length == 4) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 4));
+    } else if (dateAndTime[3].length == 3 &&
+        int.parse(dateAndTime[3].substring(0, 2)) > 24) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 3));
+    } else if (dateAndTime[3].length == 3) {
+      hour = int.parse(dateAndTime[3].substring(0, 2));
+      minute = int.parse(dateAndTime[3].substring(2, 3));
+    } else if (dateAndTime[3].length == 2 && int.parse(dateAndTime[3]) != 10) {
+      hour = int.parse(dateAndTime[3].substring(0, 1));
+      minute = int.parse(dateAndTime[3].substring(1, 2));
+    } else {
+      hour = int.parse(dateAndTime[3]);
+      minute = 0;
+    }
+    List<int> dateTimeList = [year, month, day, hour, minute];
+    //print(dateTimeList);
+    final getItem = DateTime(dateTimeList[0], dateTimeList[1], dateTimeList[2],
+        dateTimeList[3], dateTimeList[4]);
+
+    return getItem;
+  }
+
+  Future<void> getFirstSchedule() async {
+    scheduleMap.clear();
+
+    final items = (await scheduleDb.getAllSchedule());
+    //print(items);
+    int id;
+
+    for (int i = 0; i < items.length; i++) {
+      id = items[i]['id'];
+      final itemList = await scheduleDb.getSchedule(id);
+      if (itemList != null) {
+        final itemGetMap = itemList[0];
+        //print(itemGetMap);
+        // ignore: unnecessary_null_comparison
+        if (itemGetMap != null) {
+          final itemGetTitle = itemGetMap['title'] as String;
+          final getStartAt = getItems(itemGetMap['startAt'] as String);
+          final getEndAt = getItems(itemGetMap['endAt'] as String);
+          final getGetUpTime = getItems(itemGetMap['getUpTime'] as String);
+          final String itemGetMemo = itemGetMap['memo'] as String;
+
+          final getSceduleItem = Schedule(
+              title: itemGetTitle,
+              startAt: getStartAt,
+              endAt: getEndAt,
+              getUpTime: getGetUpTime,
+              memo: itemGetMemo);
+
+          DateTime checkScheduleTime = DateTime(getSceduleItem.startAt.year,
+              getSceduleItem.startAt.month, getSceduleItem.startAt.day);
+
+          if (scheduleMap.containsKey(checkScheduleTime)) {
+            scheduleMap[checkScheduleTime]!.add(getSceduleItem);
+          } else {
+            scheduleMap[
+                DateTime(getStartAt.year, getStartAt.month, getStartAt.day)] = [
+              getSceduleItem
+            ];
+          }
+          //print(scheduleMap);
+          scheduleAllList.add(getSceduleItem);
+          idList.add(id);
+        }
+      }
+    }
+    setState(() {});
+  }
+
   Future<void> editSchedule(
       {required int index, required Schedule selectedSchedule}) async {
+    int k = 0;
+    for (int j = 0; j < scheduleAllList.length; j++) {
+      if (selectedSchedule == scheduleAllList[j]) {
+        selectID = idList[k];
+        //print(selectID);
+        break;
+      }
+      k++;
+    }
     selectedStartTime = selectedSchedule.startAt;
     selectedEndTime = selectedSchedule.endAt;
     getUpTime = selectedSchedule.getUpTime;
     titelContoroller.text = selectedSchedule.title;
+
     final result = await showDialog(
         context: context,
         builder: (context) {
           return buildAddScheduleDialog();
         });
 
-    if (result == true) {
-      scheduleMap[DateTime(selectedSchedule.startAt.year,
-              selectedSchedule.startAt.month, selectedSchedule.startAt.day)]!
-          .removeAt(index);
-    }
-
     setState(() {});
   }
 
   void deleteSchedule(
-      {required int index, required Schedule selectedSchedule}) {
+      {required int index, required Schedule selectedSchedule}) async {
+    int k = 0;
+    for (int j = 0; j < scheduleAllList.length; j++) {
+      if (selectedSchedule == scheduleAllList[j]) {
+        selectID = idList[k];
+        //print(selectID);
+        break;
+      }
+      k++;
+    }
     scheduleMap[DateTime(
       selectedSchedule.startAt.year,
       selectedSchedule.startAt.month,
       selectedSchedule.startAt.day,
     )]!
         .removeAt(index);
+    await scheduleDb.deleteSchedule(selectID);
     setState(() {});
   }
 
@@ -888,14 +990,14 @@ class _CalenderItem extends StatelessWidget {
                                               },
                                             ),
                                             CupertinoDialogAction(
-                                              child: const Text('削除'),
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 Navigator.pop(context);
                                                 deleteSchedule(
                                                     index: e.key,
                                                     selectedSchedule: e.value);
                                               },
                                               isDestructiveAction: true,
+                                              child: const Text('削除'),
                                             ),
                                             CupertinoDialogAction(
                                               child: const Text('キャンセル'),
@@ -926,29 +1028,6 @@ class _CalenderItem extends StatelessWidget {
                                 ),
                               ))
                           .toList()),
-              /*moneyList == null
-                  ? Container()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: moneyList!
-                          .map((e) => Container(
-                                width: double.infinity,
-                                height: 20,
-                                alignment: Alignment.centerLeft,
-                                margin: const EdgeInsets.only(
-                                    left: 2, right: 2, top: 2),
-                                padding:
-                                    const EdgeInsets.only(left: 2, right: 2),
-                                color: Colors.green.withOpacity(0.8),
-                                child: Text(
-                                  e.title,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 10),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                          .toList(),
-                    )*/
             ],
           ),
         ),
