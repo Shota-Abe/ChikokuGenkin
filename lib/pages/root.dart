@@ -88,9 +88,11 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onDoubleTap: () {
+        if (_currentIndex == 3) {
         setState(() {
           _shouldShowBlack = !_shouldShowBlack;
         });
+        }
       },
       child: _shouldShowBlack
           ? Container(
