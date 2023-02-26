@@ -368,7 +368,11 @@ class _CalendarViewState extends State<CalendarView> {
                         date: DateTime(selectedDate.year, selectedDate.month,
                             selectedDate.day));
 
-                    await MoneyDb.createMoney(newmoneyManager);
+                    await MoneyDb.createMoney(Money(
+                        revenue: int.parse(revenueContoroller.text),
+                        expenditure: int.parse(expenditureContoroller.text),
+                        date: DateTime(selectedDate.year, selectedDate.month,
+                            selectedDate.day)));
                     await savingsManagement
                         .changeSavings(int.parse(revenueContoroller.text));
                     await savingsManagement

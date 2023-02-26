@@ -36,7 +36,7 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   void initState() {
     Future(() async {
       String targetSpend = '${await tSIo.getTargetSpend()}';
-      int savingTmp = await saveMng.getSavings() ?? 0;
+      int savingTmp = await savingsManagement.getSavings();
       int tmp = _savingMoney;
       for (int i = 0; i < 7; i++) {
         data.insert(
@@ -161,6 +161,8 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                                               setState(() {
                                                 _alertText = _editText;
                                               });
+                                              print(
+                                                  await tSIo.getTargetSpend());
                                               Navigator.pop(context);
                                             },
                                             child: Text('OK'),
