@@ -200,6 +200,42 @@ class MoneyDb {
     return sum;
   }
 
+  Future<int> getSumMonthRevenue(String year, String month) async {//income
+    int sum = 0; 
+    final moneyDb = await MoneyDb.db();
+    final result = await moneyDb.rawQuery(
+      '''
+        SELECT * FROM money 
+        WHERE date LIKE ?
+      ''',
+      ['$year-$month-%'],
+    );
+    //print(result.length);
+    for (int i = 0; i < result.length; i++) {
+      sum += result[i]['revenue'] as int;
+      //print(result[i]['revenue'] as int);
+    }
+    return sum;
+  }
+
+  Future<int> getSumMonthExpenditure(String year, String month) async { //outcome
+    int sum = 0;
+    final moneyDb = await MoneyDb.db();
+    final result = await moneyDb.rawQuery(
+      '''
+        SELECT * FROM money 
+        WHERE date LIKE ?
+      ''',
+      ['$year-$month-%'],
+    );
+    //print(result.length);
+    for (int i = 0; i < result.length; i++) {
+      sum += result[i]['expenditure'] as int;
+      //print(result[i]['expenditure'] as int);
+    }
+    return sum;
+  }
+
   Future<int> getSumDayMoney(DateTime ymd) async {
     int sum = 0;
     final moneyDb = await MoneyDb.db();

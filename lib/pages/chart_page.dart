@@ -181,7 +181,7 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                           child: FilledButton(
                             onPressed: buttonPressed1,
                             child: const Text(
-                              '貯金額を確認する',
+                              '使用金額を確認する',
                               style: TextStyle(
                                   fontSize: 10.0,
                                   color: Colors.white,
@@ -253,11 +253,12 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   }
 
   void buttonPressed1() async {
-    _savingMoney = await saveMng.getSavings();
+    int expenditure = await moneyDb.getSumMonthExpenditure(
+        DateFormat('yyyy').format(now), DateFormat('MM').format(now));
     showDialog(
       context: context,
       builder: (BuildContext context) =>
-          AlertDialog(title: Text('あなたの貯金額は${_savingMoney}円です')),
+          AlertDialog(title: Text('あなたの使用金額は\n$expenditure円です')),
     );
   }
 }
