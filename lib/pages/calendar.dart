@@ -25,7 +25,7 @@ class _CalendarViewState extends State<CalendarView> {
   late DateTime selectedDate; //選択した日付
   late int initialIndex; //ページ遷移数
   int monthDuration = 0;
-  late int selectID;
+  late int selectID = 0;
 
   DateTime? selectedStartTime;
   DateTime? selectedEndTime;
@@ -203,8 +203,7 @@ class _CalendarViewState extends State<CalendarView> {
                     if (!validationIsOk()) {
                       return;
                     }
-                    if (idList.firstWhere((element) => element == selectID) ==
-                        selectID) {
+                    if (idList.contains(selectID)) {
                       await scheduleDb.updateSchedule(
                           selectID,
                           Schedule(
@@ -213,6 +212,7 @@ class _CalendarViewState extends State<CalendarView> {
                               endAt: selectedEndTime!,
                               getUpTime: getUpTime!,
                               memo: ''));
+                      selectID = 0;
                     } else {
                       await scheduleDb.createSchedule(Schedule(
                           title: titelContoroller.text,
