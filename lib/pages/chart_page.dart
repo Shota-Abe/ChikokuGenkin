@@ -40,8 +40,8 @@ class ChartPageState extends State<ChartPage> {
         appBar: AppBar(
           title: const Text('貯金'),
         ),
-        body: SingleChildScrollView (
-          child: Column (
+        body: SingleChildScrollView(
+          child: Column(
             children: [
               Padding(
                 // graph
